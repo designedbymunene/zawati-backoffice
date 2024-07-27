@@ -1,7 +1,7 @@
 import { Props } from '@/components/CustomDrawer'
 import { GoalMembers, GoalTransaction, useFetchGoalTransactions } from '@/hooks/api/goals-api'
 import { Modal, ModalContent, ModalHeader, ModalBody, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Button, Link, Tooltip, User } from '@nextui-org/react';
-import { EyeIcon } from 'lucide-react';
+import { ArrowDown, ArrowUp, EyeIcon } from 'lucide-react';
 import React from 'react'
 
 interface ITransaction {
@@ -34,6 +34,7 @@ const GoalTransactions: React.FC<Props & ITransaction> = ({ isOpen, onOpenChange
             <User
               description={member.TransactionType === "2" ? "Deposit" : "Credit"}
               name={member.GoalName}
+              avatarProps={{ color: member.TransactionType === "2" ? "danger" : "success", icon: member.TransactionType === "2" ? <ArrowDown /> : <ArrowUp /> }}
             />
           );
         case "Amount":

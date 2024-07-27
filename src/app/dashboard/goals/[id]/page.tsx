@@ -130,9 +130,7 @@ const Page = () => {
       <Table
         isHeaderSticky
         aria-label="Goals table"
-        classNames={{
-          wrapper: "min-h-[222px]",
-        }}
+
       >
         <TableHeader columns={columns}>
           {(column) => (

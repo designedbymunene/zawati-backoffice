@@ -47,7 +47,7 @@ const ViewGroup = () => {
           title="Total Loans "
         />
         <StatisticsCard
-          color="blue"
+          color="green"
           icon={<CalendarIcon />}
           stats={"12th Jun 2023"}
           title="Next Meeting"

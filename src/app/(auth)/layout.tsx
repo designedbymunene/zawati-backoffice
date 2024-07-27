@@ -12,7 +12,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
             save.
           </p>
           <Link
-            href={"https://www.pesachama.com"}
+            href={"https://www.zawati.com"}
             className="px-5 py-2.5 bg-white text-black rounded-md"
           >
             Read More

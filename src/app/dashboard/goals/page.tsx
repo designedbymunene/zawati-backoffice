@@ -16,9 +16,6 @@ import Link from "next/link";
 
 import { EyeIcon } from "lucide-react";
 import { GoalMembers, useFetchGoalMembers } from "@/hooks/api/goals-api";
-import CreateGoalDrawer from "./_components/CreateGoalDrawer";
-
-
 
 const columns = [
   {
@@ -50,7 +47,6 @@ const columns = [
 ];
 
 const GoalsPage = () => {
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const { isPending, isError, data, error } = useFetchGoalMembers();
   const renderCell = React.useCallback(
@@ -123,17 +119,6 @@ const GoalsPage = () => {
       <Table
         isHeaderSticky
         aria-label="Goal Member table"
-        topContent={
-          <div className="flex flex-row justify-between items-center">
-            {/* <Input
-              className="w-80"
-              placeholder="Search member"
-              startContent={<SearchIcon />}
-            /> */}
-            <div />
-            <Button onClick={() => setModalOpen(true)}>Create Goal</Button>
-          </div>
-        }
         // bottomContent={
         //   <div className="flex w-full justify-center">
         //     <Pagination
@@ -166,10 +151,7 @@ const GoalsPage = () => {
           )}
         </TableBody>
       </Table>
-      <CreateGoalDrawer
-        isOpen={isModalOpen}
-        onOpenChange={() => setModalOpen(!isModalOpen)}
-      />
+
     </>
   );
 };

@@ -14,7 +14,7 @@ const StatisticsCard = ({
   color = "green",
 }: StatisticsCardProps) => {
   return (
-    <div className="min-w-0 rounded-lg shadow-xs overflow-hidden bg-white dark:bg-gray-800">
+    <div className="min-w-0 rounded-lg shadow-xs overflow-hidden bg-white dark:bg-gray-800 border border-slate-300 dark:border-slate-800">
       <div className="p-4 flex items-center">
         <div
           className={`p-3 rounded-full text-${color}-500 dark:text-${color}-100 bg-${color}-100 dark:bg-${color}-500 mr-4 `}
