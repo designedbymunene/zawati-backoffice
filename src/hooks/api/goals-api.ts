@@ -31,7 +31,7 @@ export const useFetchGoalMembers = () => {
     queryFn: async () => {
       let bodyContent = JSON.stringify({
         RequestID: "GetGroupMembers",
-        GroupID: "7",
+        GroupID: "66",
       });
 
       return (await axiosService.post("", bodyContent)).data;
