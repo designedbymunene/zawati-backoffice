@@ -42,6 +42,7 @@
     "react-hot-toast": "^2.4.1",
     "react-select": "^5.8.0",
     "react-time-picker": "^6.6.0",
+    "react-xlsx-wrapper": "^2.6.0",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",

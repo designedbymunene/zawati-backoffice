@@ -108,10 +108,48 @@ const useGetMemberProducts = (id: string) => {
   });
 };
 
+export interface UnblockPinRequest {
+  CustomerID: string;
+  UserID: string;
+}
+
+const useUnblockPin = () => {
+  return useMutation({
+    mutationFn: (data: UnblockPinRequest) => {
+      return axiosService.post("", {
+        RequestID: "UnblockCustomerPIN",
+        ...data,
+      });
+    },
+  });
+};
+
+export interface ChangeCustomerDeviceRequest {
+  CustomerID: string;
+  UserID: string;
+  DeviceID: string;
+  DeviceMake: string;
+  Platform: string;
+}
+
+const useChangeCustomerDevice = () => {
+  return useMutation({
+    mutationFn: (data: ChangeCustomerDeviceRequest) => {
+      return axiosService.post("", {
+        RequestID: "ChangeCustomerDevice",
+        ...data,
+        Platform: "0",
+      });
+    },
+  });
+};
+
 export {
   useFetchAllMembers,
   useCreateMember,
   useSearchGroupMembers,
   useGetMember,
   useGetMemberProducts,
+  useUnblockPin,
+  useChangeCustomerDevice,
 };

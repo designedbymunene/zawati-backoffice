@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
-import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { useEffect, useState } from "react";
+import { create } from "zustand";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 type GetFunctionKeys<T> = {
-  [K in keyof T]: T[K] extends ((...args: any[]) => void) ? K : never;
+  [K in keyof T]: T[K] extends (...args: any[]) => void ? K : never;
 }[keyof T];
 
 type OmittedFunctionKeys<T> = Omit<T, GetFunctionKeys<T>>;
 
 export type User = {
-  id: number;
-  username: string;
+  UserID: string;
+  Status: string;
+  Role: string;
+  UserName: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -37,11 +39,11 @@ export const useUserStore = create<UserState>()(
         saveUser: (user) => set(() => ({ user })),
       }),
       {
-        name: 'user-storage',
+        name: "user-storage",
         storage: createJSONStorage(() => sessionStorage),
-      },
-    ),
-  ),
+      }
+    )
+  )
 );
 
 const useHydratedStore = <T extends keyof OmittedFunctionKeys<UserState>>(

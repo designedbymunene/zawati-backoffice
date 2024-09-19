@@ -1,10 +1,10 @@
 import React from "react";
 
 interface StatisticsCardProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   title: string;
   stats: string | number | undefined;
-  color: string;
+  color?: string;
 }
 
 const StatisticsCard = ({

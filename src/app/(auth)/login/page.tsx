@@ -60,8 +60,8 @@ const LoginPage = () => {
           position: "top-right",
           icon: "👏",
         });
-        saveUser(response.data);
-        Cookies.set("currentUser", response.data.Role);
+        saveUser(response.data[0]);
+        Cookies.set("currentUser", response.data[0].Role);
         router.push("/dashboard");
       })
       .catch((error) => {

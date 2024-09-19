@@ -2,7 +2,13 @@
 
 import React from "react";
 import { Tabs, Tab } from "@nextui-org/react";
-import { PiggyBankIcon, User2Icon, BanknoteIcon } from "lucide-react";
+import {
+  PiggyBankIcon,
+  User2Icon,
+  BanknoteIcon,
+  ShieldCheck,
+  GoalIcon,
+} from "lucide-react";
 
 import StatisticsCard from "@/components/shared/statisticsCard";
 import PersonalInfo from "./_components/PersonalInfo";
@@ -13,6 +19,8 @@ import { thousandSeparator } from "@/lib/helper";
 import PesaChamaInfo from "./_components/PesaChamaInfo";
 import MemberLoans from "./_components/MemberLoans";
 import MemberSavings from "./_components/MemberSavings";
+import MemberSecurity from "./_components/MemberSecurity";
+import MemberGoals from "./_components/MemberGoals";
 
 const MemberProfile = () => {
   const params = useParams<{ id: string }>();
@@ -115,6 +123,28 @@ const MemberProfile = () => {
             }
           >
             <MemberLoans />
+          </Tab>
+          <Tab
+            key="goals-details"
+            title={
+              <div className="flex items-center space-x-2">
+                <GoalIcon />
+                <span>Goal Details</span>
+              </div>
+            }
+          >
+            <MemberGoals />
+          </Tab>
+          <Tab
+            key="security-details"
+            title={
+              <div className="flex items-center space-x-2">
+                <ShieldCheck />
+                <span>Security Details</span>
+              </div>
+            }
+          >
+            <MemberSecurity />
           </Tab>
         </Tabs>
       </div>

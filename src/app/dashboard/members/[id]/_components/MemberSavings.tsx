@@ -27,7 +27,7 @@ const columns = [
     label: "Amount",
   },
   {
-    key: "AMountPaid",
+    key: "AmountPaid",
     label: "Paid Amount",
   },
   {
