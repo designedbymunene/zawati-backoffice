@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GroupMembersType } from "./groups-api";
 
 export interface MemberType {
+  IDFront: any;
+  IDBack: any;
   CustomerID: string;
   FirstName: string;
   OtherNames: string;

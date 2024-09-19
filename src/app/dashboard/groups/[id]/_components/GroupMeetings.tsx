@@ -27,6 +27,7 @@ import {
   useCreateGroupMeeting,
   useGetGroupMeetings,
 } from "@/hooks/api/meetings-api";
+import { useUserStore } from "@/app/(auth)/_store";
 
 const columns = [
   {
@@ -71,13 +72,16 @@ export interface ICreateGroupMeeting {
 
 const GroupMeetings = () => {
   const params = useParams<{ id: string }>();
+  const { user } = useUserStore();
+
   const [startTime, setStartTime] = useState<Date | null>(new Date());
   const [endTime, setEndTime] = useState<Date | null>(new Date());
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
-  const { isPending, data, isError, isSuccess } = useGetGroupMeetings(
-    params.id
-  );
+  const { isPending, data, isError, isSuccess } = useGetGroupMeetings({
+    GroupID: params.id as string,
+    UserID: user.UserID as string,
+  });
   const { mutate, isPending: isCreatePending } = useCreateGroupMeeting();
   const filterPassedTime = (time: string | number | Date) => {
     const currentDate = new Date();

@@ -31,20 +31,25 @@ const PesaChamaInfo = () => {
         {customer.isPending ? (
           <Skeleton isLoaded={customer.isPending} />
         ) : (
-          <div className="grid grid-cols-2 gap-4 justify-items-center">
-            <Image
-              src={`https://apis.automittech.tech/${customer?.data[0].IDFront}`}
-              alt="Front ID"
-              width={700}
-              height={700}
-            />
-            <Image
-              src={`https://apis.automittech.tech/${customer?.data[0].IDBack}`}
-              alt="Back ID"
-              width={700}
-              height={700}
-            />
-          </div>
+          customer &&
+          customer.data && (
+            <>
+              <div className="grid grid-cols-2 gap-4 justify-items-center">
+                <Image
+                  src={`https://apis.automittech.tech/${customer?.data[0]?.IDFront}`}
+                  alt="Front ID"
+                  width={700}
+                  height={700}
+                />
+                <Image
+                  src={`https://apis.automittech.tech/${customer?.data[0].IDBack}`}
+                  alt="Back ID"
+                  width={700}
+                  height={700}
+                />
+              </div>
+            </>
+          )
         )}
       </div>
     </div>

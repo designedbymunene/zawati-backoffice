@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 export interface GroupMeetingsType {
   MeetingsID: string;
   GroupName: string;
-  ScheduledDate: Date;
+  ScheduledDate: string;
   OfficialAttending: string;
   MeetingStartedAt: string;
   MeetingEndedAt: string;
