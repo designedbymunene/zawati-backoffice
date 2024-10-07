@@ -5,6 +5,8 @@ import { Tabs, Tab } from "@nextui-org/react";
 import {
   AppWindowIcon,
   CalendarIcon,
+  FileSpreadsheet,
+  FileStack,
   LandmarkIcon,
   PiggyBankIcon,
   Table2Icon,
@@ -18,12 +20,77 @@ import GroupInformation from "./_components/GroupInformation";
 import GroupMeetings from "./_components/GroupMeetings";
 import { useGetGroupMembers } from "@/hooks/api/groups-api";
 import { useParams } from "next/navigation";
+import EOYGroupReport from "./_components/EOYGroupReport";
+import { useUserStore } from "@/app/(auth)/_store";
+import ReportsTable from "./_components/ReportsTable";
+import { useGetGroupMeetings } from "@/hooks/api/meetings-api";
+import { parseISO, differenceInDays, format } from "date-fns";
+import ScheduleLoanTable from "./_components/ScheduleLoanTable";
+
+export interface GroupMeetingType {
+  MeetingsID: string;
+  GroupName: string;
+  ScheduledDate: string;
+  OfficialAttending: string;
+  MeetingStartedAt: string;
+  MeetingEndedAt: string;
+  NoOfAttendees: string;
+  Penalizable: string;
+  Status: string;
+  OfficialComments: string;
+}
+
+function getClosestMeeting(meetings: GroupMeetingType[]) {
+  const today = new Date();
+
+  return (
+    meetings &&
+    meetings.reduce((closest: GroupMeetingType, current: GroupMeetingType) => {
+      const currentDate = parseISO(current.ScheduledDate);
+      const closestDate = parseISO(closest.ScheduledDate);
+
+      const diffCurrent = Math.abs(differenceInDays(currentDate, today));
+      const diffClosest = Math.abs(differenceInDays(closestDate, today));
+
+      return diffCurrent < diffClosest ? current : closest;
+    })
+  );
+}
 
 const ViewGroup = () => {
   const params = useParams();
+  const { user } = useUserStore();
   const { data, isPending, isSuccess } = useGetGroupMembers(
     params.id as string
   );
+
+  const nextMeeting = useGetGroupMeetings({
+    GroupID: params.id as string,
+    UserID: user.UserID as string,
+  });
+
+  const closestMeeting = getClosestMeeting(
+    nextMeeting.isPending
+      ? [
+          {
+            MeetingsID: "",
+            GroupName: "",
+            ScheduledDate: "",
+            OfficialAttending: "",
+            MeetingStartedAt: "",
+            MeetingEndedAt: "",
+            NoOfAttendees: "",
+            Penalizable: "",
+            Status: "",
+            OfficialComments: "",
+          },
+        ]
+      : (nextMeeting?.data as GroupMeetingType[])
+  );
+
+  const formatted_day = nextMeeting.isSuccess
+    ? format(new Date(closestMeeting.ScheduledDate), "d MMM yyyy")
+    : " - - ";
 
   return (
     <section>
@@ -34,7 +101,7 @@ const ViewGroup = () => {
           stats={isPending ? "Loading" : data?.length}
           title="Total Members"
         />
-        <StatisticsCard
+        {/* <StatisticsCard
           color="green"
           icon={<PiggyBankIcon />}
           stats={"90,000"}
@@ -45,11 +112,12 @@ const ViewGroup = () => {
           icon={<LandmarkIcon />}
           stats={"20,000"}
           title="Total Loans "
-        />
+        /> */}
         <StatisticsCard
           color="green"
           icon={<CalendarIcon />}
-          stats={"12th Jun 2023"}
+          type={"Date"}
+          stats={formatted_day}
           title="Next Meeting"
         />
       </div>
@@ -115,6 +183,41 @@ const ViewGroup = () => {
           >
             <GroupMembersPage />
           </Tab>
+          <Tab
+            key="5"
+            title={
+              <div className="flex items-center space-x-2">
+                <Table2Icon />
+                <span>Schedule Loan</span>
+              </div>
+            }
+          >
+            <ScheduleLoanTable />
+          </Tab>
+          <Tab
+            key="6"
+            title={
+              <div className="flex items-center space-x-2">
+                <FileStack />
+                <span>Group Reports</span>
+              </div>
+            }
+          >
+            <ReportsTable />
+          </Tab>
+          {user?.Role === "Admin" && (
+            <Tab
+              key="7"
+              title={
+                <div className="flex items-center space-x-2">
+                  <FileSpreadsheet />
+                  <span>EOY Group Reports</span>
+                </div>
+              }
+            >
+              <EOYGroupReport />
+            </Tab>
+          )}
         </Tabs>
       </div>
     </section>

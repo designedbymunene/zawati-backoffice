@@ -2,6 +2,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import axiosService from "@/services/axios-service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GroupMembersType } from "./groups-api";
+import toast from "react-hot-toast";
 
 export interface MemberType {
   IDFront: any;
@@ -43,12 +44,13 @@ const useCreateMember = () => {
     mutationFn: (newMember) => {
       return axiosService.post("", newMember);
     },
-    onSettled: async (_, error) => {
-      if (error) {
-        // console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["members"] });
-      }
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
 };
@@ -123,6 +125,16 @@ const useUnblockPin = () => {
         ...data,
       });
     },
+    onSuccess(data, variables, context) {
+      toast.success(data.data.Message);
+    },
+    onError(error, variables, context) {
+      if (error instanceof Error && error.response) {
+        toast.error(error.response.data.Message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
+    },
   });
 };
 
@@ -140,8 +152,17 @@ const useChangeCustomerDevice = () => {
       return axiosService.post("", {
         RequestID: "ChangeCustomerDevice",
         ...data,
-        Platform: "0",
       });
+    },
+    onSuccess(data, variables, context) {
+      toast.success(data.data.Message);
+    },
+    onError(error, variables, context) {
+      if (error instanceof Error && error.response) {
+        toast.error(error.response.data.Message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
     },
   });
 };

@@ -87,11 +87,11 @@ const Sidebar = (props: PropsWithChildren) => {
             title="Performance Report"
             icon={<FileSpreadsheet />}
           />
-          <AnchorLink
+          {/* <AnchorLink
             href="/dashboard/reports/onboarding"
             title="Onboarding Report"
             icon={<FileSpreadsheet />}
-          />
+          /> */}
           <li className="px-5">
             <div className="flex flex-row items-center h-8">
               <div className="text-sm font-light tracking-wide text-gray-500 text-gray-300">

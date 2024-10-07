@@ -1,15 +1,30 @@
-import { format, parse } from "date-fns";
+import { format, parse, parseISO } from "date-fns";
 
 export const splitDateAndTime = (inputDate: string) => {
-  const date = parse(inputDate, "yyyy-MM-dd HH:mm:ss", new Date());
+  try {
+    // Attempt to parse the input date
+    const date = parse(inputDate, "yyyy-MM-dd HH:mm:ss", new Date());
 
-  const formattedDate = format(date, "yyyy-MM-dd");
-  const formattedTime = format(date, "h:mm a");
+    // Check if the parsed date is valid
+    if (isNaN(date.getTime())) {
+      throw new Error("Invalid date format");
+    }
 
-  return {
-    date: formattedDate,
-    time: formattedTime,
-  };
+    // Format the date and time
+    const formattedDate = format(date, "yyyy-MM-dd");
+    const formattedTime = format(date, "h:mm a");
+
+    return {
+      date: formattedDate,
+      time: formattedTime,
+    };
+  } catch (error: any) {
+    console.error("Error splitting date and time:", error.message);
+    return {
+      date: null,
+      time: null,
+    };
+  }
 };
 
 export function generateUniqueDigits(): string {
@@ -43,4 +58,40 @@ export function getCurrentDateTimeString() {
 
 export const thousandSeparator = (number: number): string => {
   return number.toLocaleString("en-US");
+};
+
+export const formatTime = (dateString: string | null): string => {
+  // Check for null or empty string
+  if (!dateString) {
+    return "";
+  }
+
+  try {
+    // Parse the date string
+    const date = parseISO(dateString);
+
+    // Format the date to AM/PM format
+    return format(date, "hh:mm a");
+  } catch (error) {
+    console.error("Error parsing date:", error);
+    return "";
+  }
+};
+
+export const formatFriendlyDate = (dateString: string | null): string => {
+  // Check for null or empty string
+  if (!dateString) {
+    return "";
+  }
+
+  try {
+    // Parse the date string
+    const date = parseISO(dateString);
+
+    // Format the date to a human-friendly format
+    return format(date, "MMMM d, yyyy, h:mm a");
+  } catch (error) {
+    console.error("Error parsing date:", error);
+    return "";
+  }
 };

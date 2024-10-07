@@ -16,7 +16,7 @@ import { useAddGroupMember } from "@/hooks/api/groups-api";
 
 const AddGroupMember: React.FC<Props> = ({ isOpen, onOpenChange }) => {
   const params = useParams<{ id: string }>();
-  console.log("Group ID", params.id);
+
   const { isPending, error, isError, data } = useFetchAllMembers();
   const { mutate, isPending: isSavePending } = useAddGroupMember();
 

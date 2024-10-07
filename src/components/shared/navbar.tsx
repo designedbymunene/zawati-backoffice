@@ -12,10 +12,10 @@ import {
 } from "@nextui-org/react";
 import ThemeSwitcher from "./themeSwitcher";
 import { handleSignOut } from "@/middleware";
-import useHydratedStore from "@/app/(auth)/_store";
+import useHydratedStore, { useUserStore } from "@/app/(auth)/_store";
 
 const Navbar = () => {
-  const user = useHydratedStore("user");
+  const { user } = useUserStore();
 
   return (
     <header className="antialiased">
@@ -50,16 +50,16 @@ const Navbar = () => {
                     src: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
                   }}
                   className="transition-transform"
-                  description={"@JohnD"}
-                  name={"John Doe"}
+                  description={user?.Role}
+                  name={user?.UserName}
                 />
               </DropdownTrigger>
               <DropdownMenu aria-label="User Actions" variant="flat">
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-bold">Signed in as</p>
-                  <p className="font-bold">{"@JohnD"}</p>
+                  <p className="font-bold">{user?.UserName}</p>
                 </DropdownItem>
-                <DropdownItem key="settings">My Settings</DropdownItem>
+                {/* <DropdownItem key="settings">My Settings</DropdownItem> */}
                 <DropdownItem
                   key="logout"
                   color="danger"

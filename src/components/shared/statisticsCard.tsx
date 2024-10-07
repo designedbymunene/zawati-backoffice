@@ -5,6 +5,7 @@ interface StatisticsCardProps {
   title: string;
   stats: string | number | undefined;
   color?: string;
+  type?: string;
 }
 
 const StatisticsCard = ({
@@ -12,6 +13,7 @@ const StatisticsCard = ({
   title,
   stats,
   color = "green",
+  type = "number",
 }: StatisticsCardProps) => {
   return (
     <div className="min-w-0 rounded-lg shadow-xs overflow-hidden bg-white dark:bg-gray-800 border border-slate-300 dark:border-slate-800">
@@ -26,7 +28,11 @@ const StatisticsCard = ({
             {title}
           </p>
           <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-            {stats}
+            {stats === undefined || String(stats).length === 0
+              ? "0"
+              : type === "date"
+              ? Number(stats).toLocaleString()
+              : stats}
           </p>
         </div>
       </div>

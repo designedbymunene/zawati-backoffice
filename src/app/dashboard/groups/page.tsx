@@ -12,8 +12,11 @@ import {
   Tooltip,
   User,
   Button,
+  Input,
+  Pagination,
+  Spinner,
 } from "@nextui-org/react";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, SearchIcon } from "lucide-react";
 import AddGroupDrawer from "./_components/AddGroupDrawer";
 import { useFetchAllGroups } from "@/hooks/api/groups-api";
 import { GroupType } from "@/lib/types/group_type";
@@ -21,14 +24,48 @@ import useGroupStore from "./store";
 import { useRouter } from "next/navigation";
 import { statusColorMap } from "@/utils/utils";
 import { columns } from "./columns";
+import { useDebounce } from "@uidotdev/usehooks";
 
 const GroupsPage = () => {
   const router = useRouter();
+
+  const [page, setPage] = useState(1);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
-  const { isPending, isError, data, error } = useFetchAllGroups();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { isPending, isError, data, error } = useFetchAllGroups({
+    GroupName: debouncedSearchTerm,
+    Offset: String(page - 1),
+    Limit: "10",
+  });
+
+  console.log("DATA GROUPS", data);
 
   const { onSelectedContent } = useGroupStore();
+
+  const totalPages = page * 10;
+
+  const topContent = React.useCallback(() => {
+    return (
+      <div className="flex flex-row justify-between items-center">
+        <Input
+          label="Search Group"
+          isClearable
+          value={searchTerm}
+          onClear={() => setSearchTerm("")}
+          radius="lg"
+          className="w-80"
+          placeholder="Search group"
+          startContent={<SearchIcon />}
+          onChange={(event) => setSearchTerm(event.target.value)}
+        />
+        <div />
+        <Button onClick={() => setModalOpen(true)}>Add Group</Button>
+      </div>
+    );
+  }, [searchTerm, setSearchTerm]);
 
   const renderCell = React.useCallback(
     (group: GroupType, columnKey: React.Key) => {
@@ -112,28 +149,23 @@ const GroupsPage = () => {
     [onSelectedContent, router]
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
-  if (isError) {
-    return <>Error</>;
-  }
-
   return (
     <div className="flex-1">
       <Table
         isHeaderSticky
         aria-label="Group table"
-        topContent={
-          <div className="flex flex-row justify-between items-center">
-            {/* <Input
-              className="w-80"
-              placeholder="Search group"
-              startContent={<SearchIcon />}
-            /> */}
-            <div />
-            <Button onClick={() => setModalOpen(true)}>Add Group</Button>
+        topContent={topContent()}
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={totalPages}
+              onChange={(page) => setPage(page)}
+            />
           </div>
         }
         classNames={{
@@ -145,9 +177,14 @@ const GroupsPage = () => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data as GroupType[]}>
+        <TableBody
+          items={data ? (data as GroupType[]) : []}
+          isLoading={isPending}
+          emptyContent="No groups found"
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
-            <TableRow key={item.GroupNo}>
+            <TableRow key={item?.GroupNo}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey) as any}</TableCell>
               )}

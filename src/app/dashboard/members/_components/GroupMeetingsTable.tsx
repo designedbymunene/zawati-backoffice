@@ -18,13 +18,15 @@ import {
 } from "@nextui-org/react";
 import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
-import { CalendarCheck, CheckCheck, Trash } from "lucide-react";
+import { CalendarCheck, CheckCheck, EyeIcon, Trash } from "lucide-react";
 
 import { statusColorMap } from "@/utils/utils";
 import { GroupMeeting, GroupMeetingsType, meetings_column } from "../_types";
 import { ErrorMessage } from "@/types/users";
 import { useCloseGroupMeetings } from "@/hooks/api/meetings-api";
 import TopContent from "@/components/shared/TopContent";
+import Link from "next/link";
+import { splitDateAndTime } from "@/lib/helper";
 
 interface MeetingsTableProps {
   isPending: boolean;
@@ -67,17 +69,18 @@ const GroupMeetingsTable: React.FC<MeetingsTableProps> = ({
         case "ScheduledDate":
           return (
             <p className="text-bold text-sm capitalize">
+              {/* {splitDateAndTime(meeting.ScheduledDate).date} */}
               {meeting.ScheduledDate}
             </p>
           );
         case "MeetingStartedAt":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {meeting.MeetingStartedAt}
+              <p className="text-bold text-sm capitalize text-default-400">
+                {splitDateAndTime(meeting.MeetingStartedAt).time}
               </p>
               <p className="text-bold text-sm capitalize text-default-400">
-                {meeting.MeetingEndedAt}
+                {splitDateAndTime(meeting.MeetingEndedAt).time}
               </p>
             </div>
           );
@@ -101,19 +104,28 @@ const GroupMeetingsTable: React.FC<MeetingsTableProps> = ({
           );
         case "actions":
           return (
-            <Tooltip content="Mark as done">
-              <Button
-                isIconOnly
-                variant="ghost"
-                onClick={() =>
-                  createCloseMeetingMutation.mutate(meeting.MeetingsID)
-                }
-                isLoading={createCloseMeetingMutation.isPending}
-                isDisabled={createCloseMeetingMutation.isPending}
-              >
-                <CalendarCheck className="h-4 w-4" />
-              </Button>
-            </Tooltip>
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Open Meeting">
+                <Link href={`/dashboard/meetings/${meeting.MeetingsID}`}>
+                  <Button isIconOnly variant="ghost">
+                    <EyeIcon className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </Tooltip>
+              {/* <Tooltip content="Mark as done">
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  onClick={() =>
+                    createCloseMeetingMutation.mutate(meeting.MeetingsID)
+                  }
+                  isLoading={createCloseMeetingMutation.isPending}
+                  isDisabled={createCloseMeetingMutation.isPending}
+                >
+                  <CalendarCheck className="h-4 w-4" />
+                </Button>
+              </Tooltip> */}
+            </div>
           );
         default:
           return cellValue;
@@ -141,7 +153,7 @@ const GroupMeetingsTable: React.FC<MeetingsTableProps> = ({
         isLoading={isPending}
         items={refinedData}
         emptyContent={error?.response?.data?.Message as string}
-        loadingContent={<Spinner />}
+        loadingContent={<Spinner label="Loading ..." />}
       >
         {(item) => (
           <TableRow key={item.MeetingsID}>

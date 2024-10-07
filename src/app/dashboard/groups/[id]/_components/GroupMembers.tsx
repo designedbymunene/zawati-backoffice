@@ -16,16 +16,20 @@ import {
   Input,
   Button,
 } from "@nextui-org/react";
-import { EyeIcon, SearchIcon, Trash2Icon } from "lucide-react";
+import { EyeIcon, LoaderIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { GroupMembersType, useGetGroupMembers } from "@/hooks/api/groups-api";
 import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import AddGroupMember from "./AddGroupMember";
+import { axiosInstance } from "@/services/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { useUserStore } from "@/app/(auth)/_store";
 
 const columns = [
   {
-    key: "Firstname",
+    key: "FirstName",
     label: "Name",
   },
 
@@ -57,21 +61,24 @@ const columns = [
 
 const GroupMembersPage = () => {
   const params = useParams<{ id: string }>();
+  const { user } = useUserStore();
 
   const { isPending, data, isError } = useGetGroupMembers(params.id);
 
   const [isModalOpen, setModalOpen] = React.useState<boolean>(false);
+
+  const mutation = useExitMemberMutation();
 
   const renderCell = React.useCallback(
     (member: GroupMembersType, columnKey: React.Key) => {
       const cellValue = member[columnKey as keyof GroupMembersType];
 
       switch (columnKey) {
-        case "Firstname":
+        case "FirstName":
           return (
             <User
               description={member.EconomicSector}
-              name={member.Firstname + " " + member.OtherNames}
+              name={member.FirstName + " " + member.OtherNames}
             />
           );
         case "phone_number":
@@ -130,7 +137,8 @@ const GroupMembersPage = () => {
           return cellValue;
       }
     },
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [params, mutation, user, data]
   );
 
   const disableButton = data && data.length >= 30;
@@ -203,3 +211,34 @@ const GroupMembersPage = () => {
 };
 
 export default GroupMembersPage;
+
+interface ExitMemberProps {
+  customerID: string;
+  groupID: string;
+  userID: string;
+}
+const exitMember = (payload: ExitMemberProps) => {
+  return axiosInstance.post("", {
+    RequestID: "ExitZawatiMember",
+    CustomerID: payload.customerID,
+    GroupID: payload.groupID,
+    UserID: payload.userID,
+  });
+};
+const useExitMemberMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: exitMember,
+    onSuccess: async (data, variables, context) => {
+      toast.success(data.data.Message);
+      await queryClient.invalidateQueries({
+        queryKey: ["group-members"],
+      });
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(errorMessage);
+    },
+  });
+};

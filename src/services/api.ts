@@ -34,14 +34,11 @@ export const authService = {
       ...credentials,
     });
 
-    const response = await fetch(
-      "https://apis.automittech.tech/",
-      {
-        method: "POST",
-        body: bodyContent,
-        headers: headersList,
-      }
-    );
+    const response = await fetch("https://apis.automittech.tech/", {
+      method: "POST",
+      body: bodyContent,
+      headers: headersList,
+    });
 
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
@@ -182,7 +179,7 @@ export const getMembers = async (pageParam: number) => {
     await axiosInstance.post<Member[]>("", {
       RequestID: "GetMember",
       Offset: String(pageParam),
-      Limit: 3,
+      Limit: 30,
     })
   ).data;
 };
@@ -201,6 +198,24 @@ export const searchMember = async (member_name: string) => {
     await axiosInstance.post("", {
       RequestID: "GetMember",
       AnyName: member_name,
+    })
+  ).data;
+};
+
+interface CloseMeetingRequest {
+  meeting_id: string;
+  attendee_number: number;
+}
+
+export const closeMeeting = async ({
+  meeting_id,
+  attendee_number,
+}: CloseMeetingRequest) => {
+  return (
+    await axiosInstance.post("", {
+      RequestID: "CloseGroupMeeting",
+      MeetingID: meeting_id,
+      NoOfAttendees: attendee_number,
     })
   ).data;
 };

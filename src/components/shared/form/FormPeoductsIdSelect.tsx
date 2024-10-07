@@ -31,8 +31,6 @@ const FormProductsIdSelect = ({
 }: FormSelectProps) => {
   const { selectedGroup } = useScheduleStore();
 
-  console.log("selectedGroup", selectedGroup);
-
   const { isPending, data } = useScheduleGroupProducts(selectedGroup);
 
   return (

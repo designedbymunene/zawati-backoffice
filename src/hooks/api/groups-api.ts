@@ -1,17 +1,26 @@
 import { GroupType } from "@/lib/types/group_type";
 import axiosService from "@/services/axios-service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
-const useFetchAllGroups = () => {
+interface AllGroupsRequest {
+  GroupName: string;
+  Offset: string;
+  Limit: string;
+}
+
+const fetchAllGroups = async (payload: AllGroupsRequest) => {
+  const response = await axiosService.post("", {
+    RequestID: "GetGroups",
+    ...payload,
+  });
+  return response.data;
+};
+
+const useFetchAllGroups = (payload: AllGroupsRequest) => {
   return useQuery({
-    queryKey: ["groups"],
-    queryFn: async () => {
-      let bodyContent = JSON.stringify({
-        RequestID: "GetGroups",
-      });
-
-      return (await axiosService.post("", bodyContent)).data;
-    },
+    queryKey: ["groups", payload],
+    queryFn: () => fetchAllGroups(payload),
   });
 };
 
@@ -22,15 +31,15 @@ const useCreateGroup = () => {
     mutationFn: (newGroup) => {
       return axiosService.post("", newGroup);
     },
-    onSettled: async (_, error) => {
-      if (error) {
-        // console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["groups"] });
-      }
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
-
 };
 
 const useGroupProducts = (groupID: string) => {
@@ -48,8 +57,8 @@ const useGroupProducts = (groupID: string) => {
 };
 
 export interface GroupMembersType {
+  FirstName: string;
   CustomerID: string;
-  Firstname: string;
   OtherNames: string;
   IDNumber: string;
   PhoneNumber: string;
@@ -85,12 +94,13 @@ const useAddGroupMember = () => {
     mutationFn: (newGroupMember: AddGroupMemberType) => {
       return axiosService.post("", newGroupMember);
     },
-    onSettled: async (_, error) => {
-      if (error) {
-        // console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["group-members"] });
-      }
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["groups-members"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
 };
@@ -110,12 +120,13 @@ const useCreateGroupLeaders = () => {
     mutationFn: (createGroupLeaders: CreateGroupLeaders) => {
       return axiosService.post("", createGroupLeaders);
     },
-    onSettled: async (_, error) => {
-      if (error) {
-        // console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["group-leader"] });
-      }
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["groups-leader"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
 };

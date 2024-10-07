@@ -1,20 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import StatisticsCard from "@/components/shared/statisticsCard";
-import {
-  BanknoteIcon,
-  PiggyBankIcon,
-  LandmarkIcon,
-  Users2Icon,
-  SearchIcon,
-} from "lucide-react";
+import { SearchIcon, LoaderIcon } from "lucide-react";
 import { useDate } from "@/hooks/useDate";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useUserStore } from "../(auth)/_store";
 import { useGetGroupMeetings } from "@/hooks/api/meetings-api";
 import { Input } from "@nextui-org/react";
 import GroupMeetingsTable from "./members/_components/GroupMeetingsTable";
+import { useGetPerformanceReports } from "./reports/_services.tsx";
 
 export default function DashboardHome() {
   const { user } = useUserStore();
@@ -29,6 +24,24 @@ export default function DashboardHome() {
     UserID: user?.UserID as string,
   });
 
+  const dashboardStatistics = useGetPerformanceReports();
+
+  const topContent = useCallback(() => {
+    return (
+      <Input
+        label="Search"
+        isClearable
+        value={searchTerm}
+        onClear={() => setSearchTerm("")}
+        radius="lg"
+        className="w-100"
+        placeholder="Type to search..."
+        startContent={<SearchIcon />}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+    );
+  }, [searchTerm, setSearchTerm]);
+
   return (
     <section>
       <div className="flex flex-row justify-between items-center mb-5">
@@ -40,49 +53,83 @@ export default function DashboardHome() {
         </div>
       </div>
       <div className="grid gap-6 mb-5 md:grid-cols-2 xl:grid-cols-4">
-        <StatisticsCard
-          color="green"
-          icon={<BanknoteIcon />}
-          stats={""}
-          title="Total Loans"
-        />
-        <StatisticsCard
-          color="green"
-          icon={<PiggyBankIcon />}
-          stats={100}
-          title="Total Savings"
-        />
-        <StatisticsCard
-          color="green"
-          icon={<LandmarkIcon />}
-          stats={2000}
-          title="Total Members"
-        />
-        <StatisticsCard
-          color="blue"
-          icon={<Users2Icon />}
-          stats={300}
-          title="Total Groups"
-        />
+        {!dashboardStatistics.isPending ? (
+          <>
+            <StatisticsCard
+              // icon={<Users2Icon />}
+              stats={dashboardStatistics?.data?.Membership?.TotalGroups}
+              title="Total Groups"
+            />
+            <StatisticsCard
+              // icon={<LandmarkIcon />}
+              stats={dashboardStatistics?.data?.Membership?.TotalCustomers}
+              title="Total Members"
+            />
+            <StatisticsCard
+              // icon={<BanknoteIcon />}
+              stats={dashboardStatistics?.data?.Membership?.MembersPaid}
+              title="Members Paid"
+            />
+            {/* Admin Section */}
+            {user?.Role === "Admin" && (
+              <>
+                <StatisticsCard
+                  // icon={<PiggyBankIcon />}
+                  stats={dashboardStatistics?.data?.SavingsLoans?.TotalSavings}
+                  title="Total Savings"
+                />
+
+                <StatisticsCard
+                  // icon={<Users2Icon />}
+                  stats={dashboardStatistics?.data?.SavingsLoans?.TotalCover}
+                  title="Total Cover"
+                />
+                <StatisticsCard
+                  // icon={<Users2Icon />}
+                  stats={
+                    dashboardStatistics?.data?.SavingsLoans?.TotalRegFeePaid
+                  }
+                  title="Total Registration Fee Paid"
+                />
+                <StatisticsCard
+                  // icon={<Users2Icon />}
+                  stats={
+                    dashboardStatistics?.data?.SavingsLoans?.TotalLoansPaid
+                  }
+                  title="Total Loans Paid"
+                />
+                <StatisticsCard
+                  // icon={<Users2Icon />}
+                  stats={
+                    dashboardStatistics?.data?.SavingsLoans?.TotalInterestPaid
+                  }
+                  title="Total Interest Paid"
+                />
+                <StatisticsCard
+                  // icon={<Users2Icon />}
+                  stats={
+                    dashboardStatistics?.data?.SavingsLoans
+                      ?.TotalSemiLoanBalance
+                  }
+                  title="Total Semi Loan Balance"
+                />
+              </>
+            )}
+          </>
+        ) : (
+          <div className="flex">
+            <LoaderIcon />
+            &nbsp;
+            <p>Loading ...</p>
+          </div>
+        )}
       </div>
       <GroupMeetingsTable
         isError={groupsMeetingsQuery.isError}
         isPending={groupsMeetingsQuery.isPending}
         data={groupsMeetingsQuery.data}
         error={groupsMeetingsQuery.error}
-        topContent={
-          <Input
-            label="Search"
-            isClearable
-            value={searchTerm}
-            onClear={() => setSearchTerm("")}
-            radius="lg"
-            className="w-100"
-            placeholder="Type to search..."
-            startContent={<SearchIcon />}
-            onChange={(event) => setSearchTerm(event.target.value)}
-          />
-        }
+        topContent={topContent()}
       />
     </section>
   );

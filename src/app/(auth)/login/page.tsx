@@ -40,8 +40,8 @@ const LoginPage = () => {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      UserName: "TestUser",
-      Password: "1111",
+      UserName: process.env.NODE_ENV === "development" ? "TestUser" : "",
+      Password: process.env.NODE_ENV === "development" ? "1111" : "",
     },
   });
 
@@ -142,12 +142,12 @@ const LoginPage = () => {
         >
           {loading ? "Signing in..." : "Sign In"}
         </Button>
-        <p>
+        {/* <p>
           Don&#39;t have an account? &nbsp;
           <Link className="underline" href={"/register"}>
             Sign Up
           </Link>
-        </p>
+        </p> */}
       </form>
     </div>
   );

@@ -63,3 +63,45 @@ export interface GroupMeetingsType {
   Status: string;
   OfficialComments: string;
 }
+
+// src/types.ts
+export interface GroupDetails {
+  GroupName: string;
+  Status: string;
+  Town: string;
+  County: string;
+  Constituency: string;
+  Ward: string;
+}
+
+export interface CustomerDetails {
+  CustomerNumber: string;
+  CustomerName: string;
+  IDNumber: string;
+  PhoneNumber: string;
+  DateJoined: string;
+}
+
+export interface CustomerEarnings {
+  Savings: string;
+  InterestPaid: string;
+}
+
+export interface CustomerLoans {
+  SemiLoanBalance: string;
+  SemiLoanInterestBalance: string;
+  LoanBalance: string;
+  LoanInterestBalance: string;
+}
+
+export interface CustomerPayout {
+  ActualPayout: string;
+}
+
+export interface CustomerData {
+  GroupDetails: GroupDetails;
+  CustomerDetails: CustomerDetails;
+  CustomerEarnings: CustomerEarnings;
+  CustomerLoans: CustomerLoans;
+  CustomerPayout: CustomerPayout;
+}

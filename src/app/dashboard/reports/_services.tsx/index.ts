@@ -30,6 +30,8 @@ export interface SavingsLoans {
   NinetyDaysNPABal: string;
   OverNinetyDaysNPA: string;
   OverNinetyDaysNPABal: string;
+  NoOfLoansPaid: string;
+  TotalLoansPaid: string;
 }
 
 export interface Earnings {
@@ -40,7 +42,7 @@ export interface Earnings {
 export const getPerformanceReports = async () => {
   return (
     await axiosService.post<PerformanceReport>("", {
-      RequestID: "RGFCSPerfomanceReport",
+      RequestID: "ZawatiPerfomanceReport",
     })
   ).data;
 };

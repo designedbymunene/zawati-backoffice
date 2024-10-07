@@ -10,6 +10,7 @@ import {
   Chip,
   ChipProps,
   Input,
+  Link,
   Spinner,
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
   User,
 } from "@nextui-org/react";
 import { useParams } from "next/navigation";
@@ -26,8 +28,10 @@ import {
   GroupMeetingsType,
   useCreateGroupMeeting,
   useGetGroupMeetings,
+  useStartGroupMeeting,
 } from "@/hooks/api/meetings-api";
 import { useUserStore } from "@/app/(auth)/_store";
+import { CalendarCheckIcon, EyeIcon } from "lucide-react";
 
 const columns = [
   {
@@ -53,6 +57,10 @@ const columns = [
   {
     key: "status",
     label: "Status",
+  },
+  {
+    key: "actions",
+    label: "Actions",
   },
 ];
 
@@ -83,6 +91,7 @@ const GroupMeetings = () => {
     UserID: user.UserID as string,
   });
   const { mutate, isPending: isCreatePending } = useCreateGroupMeeting();
+  const startMeeting = useStartGroupMeeting();
   const filterPassedTime = (time: string | number | Date) => {
     const currentDate = new Date();
     const selectedDate = new Date(time);
@@ -96,10 +105,9 @@ const GroupMeetings = () => {
       ScheduledDate: format(startDate as Date, "yyyy-MM-dd"),
       Start: format(startTime as Date, "hh:mm:ss"),
       End: format(endTime as Date, "hh:mm:ss"),
-      UserID: "1",
+      UserID: user.UserID as string,
     };
 
-    console.log("Submit data", data);
     mutate(data);
   };
 
@@ -152,7 +160,27 @@ const GroupMeetings = () => {
               {meeting.Status === "1" ? "Active" : "Not-Active"}
             </Chip>
           );
-
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Open Meeting">
+                <Link href={`/dashboard/meetings/${meeting.MeetingsID}`}>
+                  <Button isIconOnly variant="ghost">
+                    <EyeIcon className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </Tooltip>
+              <Tooltip content="Start Meeting">
+                <Button
+                  onClick={() => startMeeting.mutate(meeting.MeetingsID)}
+                  isIconOnly
+                  variant="ghost"
+                >
+                  <CalendarCheckIcon className="h-4 w-4" />
+                </Button>
+              </Tooltip>
+            </div>
+          );
         default:
           return cellValue;
       }
@@ -204,7 +232,7 @@ const GroupMeetings = () => {
           <Button
             isLoading={isCreatePending}
             isDisabled={isCreatePending}
-            onClick={() => onSubmit()}
+            onClick={onSubmit}
             className="my-5 justify-self-end"
           >
             Save Meetings

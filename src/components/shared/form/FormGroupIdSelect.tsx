@@ -20,7 +20,11 @@ const FormGroupIdSelect = ({
   label,
   errors,
 }: FormSelectProps) => {
-  const { isPending, data } = useFetchAllGroups();
+  const { isPending, data } = useFetchAllGroups({
+    GroupName: "",
+    Offset: "0",
+    Limit: "10",
+  });
 
   const { onSelectedGroup } = useScheduleStore();
 

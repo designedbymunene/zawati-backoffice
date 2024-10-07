@@ -14,7 +14,11 @@ interface FormSelectProps {
 }
 
 const FormGroupSelect = ({ name, control, label, errors }: FormSelectProps) => {
-  const { isPending, data } = useFetchAllGroups();
+  const { isPending, data } = useFetchAllGroups({
+    GroupName: "",
+    Offset: "0",
+    Limit: "10",
+  });
 
   return (
     <Controller

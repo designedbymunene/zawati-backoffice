@@ -8,6 +8,7 @@ import {
   BanknoteIcon,
   ShieldCheck,
   GoalIcon,
+  FileIcon,
 } from "lucide-react";
 
 import StatisticsCard from "@/components/shared/statisticsCard";
@@ -21,6 +22,8 @@ import MemberLoans from "./_components/MemberLoans";
 import MemberSavings from "./_components/MemberSavings";
 import MemberSecurity from "./_components/MemberSecurity";
 import MemberGoals from "./_components/MemberGoals";
+import PayoutReport from "../_components/PayoutReport";
+import ExitMember from "./_components/ExitMember";
 
 const MemberProfile = () => {
   const params = useParams<{ id: string }>();
@@ -145,6 +148,17 @@ const MemberProfile = () => {
             }
           >
             <MemberSecurity />
+          </Tab>
+          <Tab
+            key="payout-details"
+            title={
+              <div className="flex items-center space-x-2">
+                <FileIcon />
+                <span>Exit Member</span>
+              </div>
+            }
+          >
+            <ExitMember />
           </Tab>
         </Tabs>
       </div>

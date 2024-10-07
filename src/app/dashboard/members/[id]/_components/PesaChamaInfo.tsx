@@ -3,12 +3,17 @@ import { Button, Skeleton } from "@nextui-org/react";
 import { useParams } from "next/navigation";
 import React from "react";
 import Image from "next/image";
+import { axiosInstance } from "@/services/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const PesaChamaInfo = () => {
   const params = useParams<{ id: string }>();
   const customer = useGetMember(params.id);
 
   const { isPending, data, isError } = useGetMemberProducts(params.id);
+
+  const mutation = useDeleteUploadsMutation();
 
   return (
     <div className=" mt-10">
@@ -27,7 +32,17 @@ const PesaChamaInfo = () => {
         </ul>
       </div>
       <div className="mv-10">
-        <h2 className="mb-5 text-lg font-semibold">Kenyan National ID</h2>
+        <div className="flex justify-between align-center">
+          <h2 className="mb-5 text-lg font-semibold">Kenyan National ID</h2>
+          <Button
+            className="mb-5"
+            onClick={() => mutation.mutate(params.id)}
+            isDisabled={mutation.isPending}
+            isLoading={mutation.isPending}
+          >
+            {mutation.isPending ? "Deleting..." : "Delete Uploads"}
+          </Button>
+        </div>
         {customer.isPending ? (
           <Skeleton isLoaded={customer.isPending} />
         ) : (
@@ -57,3 +72,30 @@ const PesaChamaInfo = () => {
 };
 
 export default PesaChamaInfo;
+
+export const deleteUploads = async (CustomerID: string) => {
+  return (
+    await axiosInstance.post("", {
+      RequestID: "DeleteCustomerUploads",
+      CustomerID,
+    })
+  ).data;
+};
+
+const useDeleteUploadsMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteUploads,
+    onSuccess: async () => {
+      toast.success("Uploads Deleted Successfully");
+      await queryClient.invalidateQueries({
+        queryKey: ["group-members"],
+      });
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(errorMessage);
+    },
+  });
+};

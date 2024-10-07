@@ -1,5 +1,6 @@
 import axiosService from "@/services/axios-service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const useFetchLoans = (body: object) => {
   return useQuery({
@@ -14,6 +15,13 @@ const useScheduleLoans = () => {
   return useMutation({
     mutationFn: (scheduleLoan) => {
       return axiosService.post("", scheduleLoan);
+    },
+    onSuccess(data, variables, context) {
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
 };
@@ -88,14 +96,14 @@ const useScheduleGroupProducts = (groupID: string) => {
 };
 
 export interface CreateFixedInterestLoanRequest {
-  GroupID: string
-  ProductID: string
-  CustomerID: string
-  LoanType: string
-  LoanAmtApplied: string
-  LoanFee: string
-  LoanInsurance: string
-  LoanDuration: string
+  GroupID: string;
+  ProductID: string;
+  CustomerID: string;
+  LoanType: string;
+  LoanAmtApplied: string;
+  LoanFee: string;
+  LoanInsurance: string;
+  LoanDuration: string;
 }
 
 const useCreateFixedInterestLoan = () => {
@@ -105,15 +113,16 @@ const useCreateFixedInterestLoan = () => {
     mutationFn: (data: CreateFixedInterestLoanRequest) => {
       return axiosService.post("", {
         RequestID: "CreateFixedInterestLoan",
-        ...data
+        ...data,
       });
     },
-    onSettled: async (_, error) => {
-      if (error) {
-        // console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["loans"] });
-      }
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["loans"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
   });
 };
@@ -121,22 +130,22 @@ const useCreateFixedInterestLoan = () => {
 export function useGetLoanInstallments(id: string) {
   return useQuery({
     queryKey: ["ward"],
-    queryFn: async () => await axiosService.post("", {
-      RequestID: "GetLoanInstallments",
-      LoanID: id
-    }),
+    queryFn: async () =>
+      await axiosService.post("", {
+        RequestID: "GetLoanInstallments",
+        LoanID: id,
+      }),
   });
 }
 
 export interface PayLoanRequest {
-  CustomerID: string
-  TransactionType: string
-  ReceiptNo: string
-  Amount: string
-  PaymenyReference: string | null
-  Status: string
+  CustomerID: string;
+  TransactionType: string;
+  ReceiptNo: string;
+  Amount: string;
+  PaymenyReference: string | null;
+  Status: string;
 }
-
 
 const usePayLoan = () => {
   // const queryClient = useQueryClient();
@@ -145,8 +154,16 @@ const usePayLoan = () => {
     mutationFn: (data: PayLoanRequest) => {
       return axiosService.post("", {
         RequestID: "PayLoan",
-        ...data
+        ...data,
       });
+    },
+    onSuccess(data, variables, context) {
+      // queryClient.invalidateQueries({ queryKey: ["groups-leader"] });
+      toast.success(data.data.Message);
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data.Message as string;
+      toast.error(error.message);
     },
     // onSettled: async (_, error) => {
     //   if (error) {
@@ -165,5 +182,5 @@ export {
   useGetTotalLoans,
   useScheduleGroupProducts,
   useCreateFixedInterestLoan,
-  usePayLoan
+  usePayLoan,
 };

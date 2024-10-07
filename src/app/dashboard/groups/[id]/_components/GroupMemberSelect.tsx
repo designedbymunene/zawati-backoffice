@@ -69,19 +69,19 @@ const GroupMemberSelect: React.FC<GroupMemberSelectProps> = ({ label }) => {
         {(item) => (
           <AutocompleteItem
             key={item.CustomerID}
-            textValue={item.Firstname + " " + item.OtherNames}
+            textValue={item.FirstName + " " + item.OtherNames}
           >
             <div className="flex justify-between items-center">
               <div className="flex gap-2 items-center">
                 <Avatar
-                  alt={item.Firstname + " " + item.OtherNames}
+                  alt={item.FirstName + " " + item.OtherNames}
                   className="flex-shrink-0"
                   size="sm"
-                  name={item.Firstname + " " + item.OtherNames}
+                  name={item.FirstName + " " + item.OtherNames}
                 />
                 <div className="flex flex-col">
                   <span className="text-small">
-                    {item.Firstname + " " + item.OtherNames}
+                    {item.FirstName + " " + item.OtherNames}
                   </span>
                   <span className="text-tiny text-default-400">
                     {item.EconomicSector}
