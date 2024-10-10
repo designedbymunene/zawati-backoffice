@@ -54,6 +54,8 @@ export default function DashboardHome() {
       </div>
       <div className="grid gap-6 mb-5 md:grid-cols-2 xl:grid-cols-4">
         {!dashboardStatistics.isPending ? (
+          // TODO: STL, MTL, LTL Balances (charts)
+          // TODO: Goals - Target and Current (charts)
           <>
             <StatisticsCard
               // icon={<Users2Icon />}
@@ -76,7 +78,7 @@ export default function DashboardHome() {
                 <StatisticsCard
                   // icon={<PiggyBankIcon />}
                   stats={dashboardStatistics?.data?.SavingsLoans?.TotalSavings}
-                  title="Total Savings"
+                  title="Total Contributions"
                 />
 
                 <StatisticsCard

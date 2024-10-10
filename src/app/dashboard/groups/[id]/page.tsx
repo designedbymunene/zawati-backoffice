@@ -7,8 +7,6 @@ import {
   CalendarIcon,
   FileSpreadsheet,
   FileStack,
-  LandmarkIcon,
-  PiggyBankIcon,
   Table2Icon,
   Users2Icon,
   UsersIcon,
@@ -24,7 +22,7 @@ import EOYGroupReport from "./_components/EOYGroupReport";
 import { useUserStore } from "@/app/(auth)/_store";
 import ReportsTable from "./_components/ReportsTable";
 import { useGetGroupMeetings } from "@/hooks/api/meetings-api";
-import { parseISO, differenceInDays, format } from "date-fns";
+import { parseISO, differenceInDays, format, isBefore } from "date-fns";
 import ScheduleLoanTable from "./_components/ScheduleLoanTable";
 
 export interface GroupMeetingType {
@@ -40,12 +38,49 @@ export interface GroupMeetingType {
   OfficialComments: string;
 }
 
+// function getClosestMeeting(meetings: GroupMeetingType[]) {
+//   const today = new Date();
+
+//   return (
+//     meetings &&
+//     meetings.reduce((closest: GroupMeetingType, current: GroupMeetingType) => {
+//       const currentDate = parseISO(current.ScheduledDate);
+//       const closestDate = parseISO(closest.ScheduledDate);
+
+//       const diffCurrent = Math.abs(differenceInDays(currentDate, today));
+//       const diffClosest = Math.abs(differenceInDays(closestDate, today));
+
+//       return diffCurrent < diffClosest ? current : closest;
+//     })
+//   );
+// }
+
 function getClosestMeeting(meetings: GroupMeetingType[]) {
   const today = new Date();
 
-  return (
-    meetings &&
-    meetings.reduce((closest: GroupMeetingType, current: GroupMeetingType) => {
+  // Filter out meetings that are scheduled before today
+  const upcomingMeetings = meetings.filter((meeting) => {
+    const scheduledDate = parseISO(meeting.ScheduledDate);
+    return !isBefore(scheduledDate, today); // Only include meetings that are today or in the future
+  });
+
+  if (upcomingMeetings.length === 0) {
+    return {
+      MeetingsID: "",
+      GroupName: "",
+      ScheduledDate: "",
+      OfficialAttending: "",
+      MeetingStartedAt: "",
+      MeetingEndedAt: "",
+      NoOfAttendees: "",
+      Penalizable: "",
+      Status: "",
+      OfficialComments: "",
+    }; // No upcoming meetings
+  }
+
+  return upcomingMeetings.reduce(
+    (closest: GroupMeetingType, current: GroupMeetingType) => {
       const currentDate = parseISO(current.ScheduledDate);
       const closestDate = parseISO(closest.ScheduledDate);
 
@@ -53,7 +88,7 @@ function getClosestMeeting(meetings: GroupMeetingType[]) {
       const diffClosest = Math.abs(differenceInDays(closestDate, today));
 
       return diffCurrent < diffClosest ? current : closest;
-    })
+    }
   );
 }
 
@@ -69,29 +104,31 @@ const ViewGroup = () => {
     UserID: user.UserID as string,
   });
 
+  const initialMeeting = {
+    MeetingsID: "",
+    GroupName: "",
+    ScheduledDate: "",
+    OfficialAttending: "",
+    MeetingStartedAt: "",
+    MeetingEndedAt: "",
+    NoOfAttendees: "",
+    Penalizable: "",
+    Status: "",
+    OfficialComments: "",
+  };
+
   const closestMeeting = getClosestMeeting(
     nextMeeting.isPending
-      ? [
-          {
-            MeetingsID: "",
-            GroupName: "",
-            ScheduledDate: "",
-            OfficialAttending: "",
-            MeetingStartedAt: "",
-            MeetingEndedAt: "",
-            NoOfAttendees: "",
-            Penalizable: "",
-            Status: "",
-            OfficialComments: "",
-          },
-        ]
+      ? [initialMeeting]
       : (nextMeeting?.data as GroupMeetingType[])
   );
 
-  const formatted_day = nextMeeting.isSuccess
-    ? format(new Date(closestMeeting.ScheduledDate), "d MMM yyyy")
-    : " - - ";
-
+  const formatted_day =
+    nextMeeting.isSuccess && closestMeeting.ScheduledDate.length > 1
+      ? format(new Date(closestMeeting.ScheduledDate), "d MMM yyyy")
+      : " - - ";
+  // TODO: Shouldn't show previous date if it is in the future
+  // TODO: Latitude and Longitude should be added - GPS coordinates
   return (
     <section>
       <div className="grid gap-6 mb-5 md:grid-cols-2 xl:grid-cols-4">
@@ -160,20 +197,9 @@ const ViewGroup = () => {
           >
             <GroupLeads />
           </Tab>
-          <Tab
-            key="3"
-            title={
-              <div className="flex items-center space-x-2">
-                <CalendarIcon />
-                <span>Group Meetings</span>
-              </div>
-            }
-          >
-            <GroupMeetings />
-          </Tab>
 
           <Tab
-            key="4"
+            key="3"
             title={
               <div className="flex items-center space-x-2">
                 <Table2Icon />
@@ -183,40 +209,60 @@ const ViewGroup = () => {
           >
             <GroupMembersPage />
           </Tab>
-          <Tab
-            key="5"
-            title={
-              <div className="flex items-center space-x-2">
-                <Table2Icon />
-                <span>Schedule Loan</span>
-              </div>
-            }
-          >
-            <ScheduleLoanTable />
-          </Tab>
-          <Tab
-            key="6"
-            title={
-              <div className="flex items-center space-x-2">
-                <FileStack />
-                <span>Group Reports</span>
-              </div>
-            }
-          >
-            <ReportsTable />
-          </Tab>
+
+          {user?.Role?.includes("Admin") ||
+            (user?.Role?.includes("Loan Scheduler") && (
+              <>
+                <Tab
+                  key="4"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <CalendarIcon />
+                      <span>Group Meetings</span>
+                    </div>
+                  }
+                >
+                  <GroupMeetings />
+                </Tab>
+                <Tab
+                  key="5"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <Table2Icon />
+                      <span>Schedule Loan</span>
+                    </div>
+                  }
+                >
+                  <ScheduleLoanTable />
+                </Tab>
+              </>
+            ))}
+
           {user?.Role === "Admin" && (
-            <Tab
-              key="7"
-              title={
-                <div className="flex items-center space-x-2">
-                  <FileSpreadsheet />
-                  <span>EOY Group Reports</span>
-                </div>
-              }
-            >
-              <EOYGroupReport />
-            </Tab>
+            <>
+              <Tab
+                key="6"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <FileStack />
+                    <span>Group Reports</span>
+                  </div>
+                }
+              >
+                <ReportsTable />
+              </Tab>
+              <Tab
+                key="7"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <FileSpreadsheet />
+                    <span>EOY Group Reports</span>
+                  </div>
+                }
+              >
+                <EOYGroupReport />
+              </Tab>
+            </>
           )}
         </Tabs>
       </div>

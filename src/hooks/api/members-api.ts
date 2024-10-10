@@ -24,16 +24,24 @@ export interface MemberType {
   SubCounty: string;
 }
 
-const useFetchAllMembers = () => {
-  return useQuery({
-    queryKey: ["members"],
-    queryFn: async () => {
-      let bodyContent = JSON.stringify({
-        RequestID: "GetMember",
-      });
+interface AllMembersRequest {
+  AnyName: string;
+  Offset: string;
+  Limit: string;
+}
 
-      return (await axiosService.post("", bodyContent)).data;
-    },
+const fetchAllMembers = async (payload: AllMembersRequest) => {
+  const response = await axiosService.post("", {
+    RequestID: "GetMember",
+    ...payload,
+  });
+  return response.data;
+};
+
+const useFetchAllMembers = (payload: AllMembersRequest) => {
+  return useQuery({
+    queryKey: ["members", payload],
+    queryFn: () => fetchAllMembers(payload),
   });
 };
 

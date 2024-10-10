@@ -12,11 +12,14 @@ import {
   User,
   Input,
   Button,
+  Pagination,
+  Spinner,
 } from "@nextui-org/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useFetchAllMembers } from "@/hooks/api/members-api";
 import AddMembersDrawer from "./_components/AddMembersDrawer";
+import { useDebounce } from "@uidotdev/usehooks";
 
 interface Members {
   CustomerID: string;
@@ -72,8 +75,38 @@ const columns = [
 
 const MembersPage = () => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [page, setPage] = useState(1);
 
-  const { isPending, isError, data, error } = useFetchAllMembers();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { isPending, isError, data, error, isSuccess } = useFetchAllMembers({
+    AnyName: debouncedSearchTerm,
+    Offset: String(page - 1),
+    Limit: "10",
+  });
+
+  const totalPages = 10;
+
+  const topContent = React.useCallback(() => {
+    return (
+      <div className="flex flex-row justify-between items-center">
+        <Input
+          label="Search Member"
+          isClearable
+          value={searchTerm}
+          onClear={() => setSearchTerm("")}
+          radius="lg"
+          className="w-80"
+          placeholder="Search Member"
+          startContent={<SearchIcon />}
+          onChange={(event) => setSearchTerm(event.target.value)}
+        />
+        <div />
+        <Button onClick={() => setModalOpen(true)}>Create Member</Button>
+      </div>
+    );
+  }, [searchTerm, setSearchTerm]);
 
   const renderCell = React.useCallback(
     (member: Members, columnKey: React.Key) => {
@@ -155,43 +188,25 @@ const MembersPage = () => {
     []
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
-  if (isError) {
-    return <>Error</>;
-  }
-
   return (
-    <>
+    <div className="flex-1">
       <Table
         isHeaderSticky
-        aria-label="Group table"
-        topContent={
-          <div className="flex flex-row justify-between items-center">
-            {/* <Input
-              className="w-80"
-              placeholder="Search member"
-              startContent={<SearchIcon />}
-            /> */}
-            <div />
-            <Button onClick={() => setModalOpen(true)}>Create Member</Button>
+        aria-label="Member table"
+        topContent={topContent()}
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={totalPages}
+              onChange={(page) => setPage(page)}
+            />
           </div>
         }
-        // bottomContent={
-        //   <div className="flex w-full justify-center">
-        //     <Pagination
-        //       isCompact
-        //       showControls
-        //       showShadow
-        //       color="secondary"
-        //       page={page}
-        //       total={pages}
-        //       onChange={(page) => setPage(page)}
-        //     />
-        //   </div>
-        // }
         classNames={{
           wrapper: "min-h-[222px]",
         }}
@@ -201,7 +216,12 @@ const MembersPage = () => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data as Members[]}>
+        <TableBody
+          items={isSuccess ? (data as Members[]) : isError ? [] : []}
+          isLoading={isPending}
+          emptyContent={isError ? error.message : "No members found"}
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
             <TableRow key={item.CustomerID}>
               {(columnKey) => (
@@ -215,7 +235,7 @@ const MembersPage = () => {
         isOpen={isModalOpen}
         onOpenChange={() => setModalOpen(!isModalOpen)}
       />
-    </>
+    </div>
   );
 };
 

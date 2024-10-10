@@ -140,7 +140,12 @@ const GroupMeetingsTable: React.FC<MeetingsTableProps> = ({
     <Table
       isHeaderSticky
       aria-label="All Meetings Table"
-      topContent={<TopContent right={topContent} />}
+      topContent={
+        <TopContent
+          right={topContent}
+          left={<p className="text-lg">Pending Meetings</p>}
+        />
+      }
       classNames={{
         base: "max-h-[620px]",
         table: "min-h-[120px]",

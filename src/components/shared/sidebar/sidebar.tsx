@@ -1,3 +1,5 @@
+"use client";
+
 import React, { PropsWithChildren } from "react";
 import {
   BanknoteIcon,
@@ -16,8 +18,10 @@ import {
 } from "lucide-react";
 
 import AnchorLink from "./anchorLink";
+import { useUserStore } from "@/app/(auth)/_store";
 
 const Sidebar = (props: PropsWithChildren) => {
+  const { user } = useUserStore();
   return (
     <aside
       id="logo-sidebar"
@@ -63,58 +67,62 @@ const Sidebar = (props: PropsWithChildren) => {
             title="Dividends"
             icon={<PercentIcon />}
           /> */}
-          <li className="px-5">
-            <div className="flex flex-row items-center h-8">
-              <div className="text-sm font-light tracking-wide text-gray-500 dark:text-gray-300">
-                Settings
-              </div>
-            </div>
-          </li>
-          <AnchorLink
-            href="/dashboard/products"
-            title="Products"
-            icon={<TagIcon />}
-          />
-          <li className="px-5">
-            <div className="flex flex-row items-center h-8">
-              <div className="text-sm font-light tracking-wide text-gray-500 dark:text-gray-300">
-                Reports
-              </div>
-            </div>
-          </li>
-          <AnchorLink
-            href="/dashboard/reports"
-            title="Performance Report"
-            icon={<FileSpreadsheet />}
-          />
-          {/* <AnchorLink
-            href="/dashboard/reports/onboarding"
-            title="Onboarding Report"
-            icon={<FileSpreadsheet />}
-          /> */}
-          <li className="px-5">
-            <div className="flex flex-row items-center h-8">
-              <div className="text-sm font-light tracking-wide text-gray-500 text-gray-300">
-                Application
-              </div>
-            </div>
-          </li>
-          <AnchorLink href="/dashboard/users" title="User" icon={<User2 />} />
-          <AnchorLink
-            href="/dashboard/audits"
-            title="Audits"
-            icon={<Monitor />}
-          />
-          <AnchorLink
-            href="/dashboard/permissions"
-            title="Permission"
-            icon={<LockIcon />}
-          />
-          <AnchorLink
-            href="/dashboard/roles"
-            title="Role"
-            icon={<UserCog2 />}
-          />
+          {user?.Role === "Admin" && (
+            <>
+              {" "}
+              <li className="px-5">
+                <div className="flex flex-row items-center h-8">
+                  <div className="text-sm font-light tracking-wide text-gray-500 dark:text-gray-300">
+                    Settings
+                  </div>
+                </div>
+              </li>
+              <AnchorLink
+                href="/dashboard/products"
+                title="Products"
+                icon={<TagIcon />}
+              />
+              <li className="px-5">
+                <div className="flex flex-row items-center h-8">
+                  <div className="text-sm font-light tracking-wide text-gray-500 dark:text-gray-300">
+                    Reports
+                  </div>
+                </div>
+              </li>
+              <AnchorLink
+                href="/dashboard/reports"
+                title="Performance Report"
+                icon={<FileSpreadsheet />}
+              />
+              <li className="px-5">
+                <div className="flex flex-row items-center h-8">
+                  <div className="text-sm font-light tracking-wide text-gray-500 text-gray-300">
+                    Application
+                  </div>
+                </div>
+              </li>
+              <AnchorLink
+                href="/dashboard/users"
+                title="User"
+                icon={<User2 />}
+              />
+              <AnchorLink
+                href="/dashboard/audits"
+                title="Audits"
+                icon={<Monitor />}
+              />
+              <AnchorLink
+                href="/dashboard/permissions"
+                title="Permission"
+                icon={<LockIcon />}
+              />
+              <AnchorLink
+                href="/dashboard/roles"
+                title="Role"
+                icon={<UserCog2 />}
+              />
+            </>
+          )}
           {/* <li className="px-5">
             <div className="flex flex-row items-center h-8">
               <div className="text-sm font-light tracking-wide text-gray-500">

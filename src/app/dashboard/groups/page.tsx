@@ -35,17 +35,17 @@ const GroupsPage = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  // const offset = (page - 1) * 10;
+
   const { isPending, isError, data, error } = useFetchAllGroups({
     GroupName: debouncedSearchTerm,
     Offset: String(page - 1),
-    Limit: "10",
+    Limit: "15",
   });
-
-  console.log("DATA GROUPS", data);
 
   const { onSelectedContent } = useGroupStore();
 
-  const totalPages = page * 10;
+  const totalPages = 10;
 
   const topContent = React.useCallback(() => {
     return (

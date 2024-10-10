@@ -31,7 +31,7 @@ const GroupLeads = () => {
             data.map((item) => (
               <li
                 key={item.RoleCode}
-                className="m-3 bg-slate-300 rounded-lg p-3"
+                className="m-3 bg-slate-300 rounded-lg p-3 dark:text-slate-900"
               >
                 <p className="font-bold font-sans">{item.RoleCode}</p>
                 <p className="font-mono">{item.CustomerName}</p>
