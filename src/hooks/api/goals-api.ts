@@ -11,55 +11,61 @@ export interface NotFoundResponse {
 }
 
 export interface GoalMembers {
-  CustomerID: string
-  Country: string
-  CountyName: string
-  ConstituencyName: string
-  FirstName: string
-  OtherNames: string
-  IDNumber: string
-  PhoneNumber: string
-  YearOfBirth: string
-  Gender: string
-  EconomicSector: string
-  DateJoined: string
+  CustomerID: string;
+  Country: string;
+  CountyName: string;
+  ConstituencyName: string;
+  FirstName: string;
+  OtherNames: string;
+  IDNumber: string;
+  PhoneNumber: string;
+  YearOfBirth: string;
+  Gender: string;
+  EconomicSector: string;
+  DateJoined: string;
 }
 
-export const useFetchGoalMembers = () => {
+export interface OffsetLimitRequest {
+  Offset: string;
+  Limit: string;
+}
+
+export const useFetchGoalMembers = (payload: OffsetLimitRequest) => {
   return useQuery({
     queryKey: ["goal-members"],
     queryFn: async () => {
       let bodyContent = JSON.stringify({
         RequestID: "GetGroupMembers",
         GroupID: "66",
+        ...payload,
       });
-
-      return (await axiosService.post("", bodyContent)).data;
+      const response = await axiosService.post("", bodyContent);
+      return response.data;
     },
   });
 };
 
 export interface Goal {
-  RowNo: string
-  GoalName: string
-  GoalDescription: string
-  Period: string
-  DateStarted: string
-  Status: string
-  TotalSaving: string
-  CashOut: string
-  InterestEarned: number
-  TotalSavings: number
+  RowNo: string;
+  GoalName: string;
+  GoalDescription: string;
+  Period: string;
+  DateStarted: string;
+  Status: string;
+  TotalSaving: string;
+  CashOut: string;
+  InterestEarned: number;
+  TotalSavings: number;
 }
 
 export const useFetchAllGoals = (id: string) => {
   return useQuery({
     queryKey: ["goals", id],
-    queryFn: () => getGoals(id)
+    queryFn: () => getGoals(id),
   });
 };
 
- const getGoals = async (id: string) => {
+const getGoals = async (id: string) => {
   try {
     const response = await axiosService.post<NotFoundResponse | Goal[]>("", {
       RequestID: "GetMyGoals",
@@ -83,28 +89,33 @@ export const useFetchAllGoals = (id: string) => {
 };
 
 export interface GoalTransaction {
-  GoalName: string
-  TransactionType: string
-  Amount: string
-  Status: string
+  GoalName: string;
+  TransactionType: string;
+  Amount: string;
+  Status: string;
 }
 
 export const useFetchGoalTransactions = ({
   customer,
-  goal
-}: { customer: string; goal: string }) => {
+  goal,
+}: {
+  customer: string;
+  goal: string;
+}) => {
   return useQuery({
     queryKey: ["goal-transactions", goal],
-    queryFn: () => getMyLastTransactions(customer, goal)
+    queryFn: () => getMyLastTransactions(customer, goal),
   });
 };
 
 const getMyLastTransactions = async (customer: string, goal: string) => {
   try {
-    const response = await axiosService.post<NotFoundResponse | GoalTransaction[]>("", {
-     "RequestID": "GetMyLastTransactions",
-    "CustomerID": customer,
-    "GoalID": goal
+    const response = await axiosService.post<
+      NotFoundResponse | GoalTransaction[]
+    >("", {
+      RequestID: "GetMyLastTransactions",
+      CustomerID: customer,
+      GoalID: goal,
     });
     const data = response.data;
 
@@ -141,8 +152,10 @@ export function useCreateGoalMutation() {
       const errorMessage = error?.response?.data?.Message as string;
       toast.error(errorMessage);
     },
-    onSuccess: async (data, variables, context ) => {
-      await queryClient.invalidateQueries({ queryKey: ["goals", variables.CustomerID] });
+    onSuccess: async (data, variables, context) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["goals", variables.CustomerID],
+      });
       toast.success(data.Message);
     },
   });

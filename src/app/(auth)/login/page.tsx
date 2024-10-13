@@ -26,7 +26,6 @@ const formSchema = z.object({
 
 const LoginPage = () => {
   const router = useRouter();
-  const { saveUser } = useUserStore();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -55,12 +54,13 @@ const LoginPage = () => {
       })
       .then((response) => {
         setLoading(false);
-        console.log(response.data);
+        const setUser = useUserStore.getState().setUser;
+
         toast.success(`Welcome back, ${response.data[0].UserName}`, {
           position: "top-right",
           icon: "👏",
         });
-        saveUser(response.data[0]);
+        setUser(response.data[0]);
         Cookies.set("currentUser", response.data[0].Role);
         router.push("/dashboard");
       })

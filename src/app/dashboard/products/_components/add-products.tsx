@@ -24,6 +24,7 @@ const AddProductsDrawer: React.FC<Props> = ({ isOpen, onOpenChange }) => {
       ProductDesc: "",
       ProductCost: "",
       ProductFrequency: "",
+      WaitingPeriod: "",
     },
   });
 
@@ -73,6 +74,12 @@ const AddProductsDrawer: React.FC<Props> = ({ isOpen, onOpenChange }) => {
           <FormInput
             label="Product Cost"
             name="ProductCost"
+            control={control}
+            errors={errors}
+          />
+          <FormInput
+            label="Waiting Period (days)"
+            name="WaitingPeriod"
             control={control}
             errors={errors}
           />

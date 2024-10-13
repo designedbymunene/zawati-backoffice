@@ -40,7 +40,7 @@ const GroupsPage = () => {
   const { isPending, isError, data, error } = useFetchAllGroups({
     GroupName: debouncedSearchTerm,
     Offset: String(page - 1),
-    Limit: "15",
+    Limit: "10",
   });
 
   const { onSelectedContent } = useGroupStore();
@@ -59,7 +59,9 @@ const GroupsPage = () => {
           className="w-80"
           placeholder="Search group"
           startContent={<SearchIcon />}
-          onChange={(event) => setSearchTerm(event.target.value)}
+          onChange={(event) => {
+            setSearchTerm(event.target.value), setPage(1);
+          }}
         />
         <div />
         <Button onClick={() => setModalOpen(true)}>Add Group</Button>
@@ -180,7 +182,7 @@ const GroupsPage = () => {
         <TableBody
           items={data ? (data as GroupType[]) : []}
           isLoading={isPending}
-          emptyContent="No groups found"
+          emptyContent={isError ? error.message : "No Groups Found"}
           loadingContent={<Spinner label="Loading ..." />}
         >
           {(item) => (

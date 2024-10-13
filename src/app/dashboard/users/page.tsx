@@ -371,7 +371,7 @@ const registerUser = async (request: RegisterUserRequest) => {
   return response.data;
 };
 
-export const useRegisterUser = () => {
+const useRegisterUser = () => {
   return useMutation({
     mutationFn: registerUser,
   });

@@ -17,6 +17,7 @@ import { useUserStore } from "@/app/(auth)/_store";
 import TopContent from "@/components/shared/TopContent";
 import { axiosInstance } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import PendingState from "@/components/shared/PendingState";
 
 const EOYGroupReport = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,91 +34,7 @@ const EOYGroupReport = () => {
     UserID: user?.UserID as string,
   });
 
-  const refinedData: EOYDetail[] =
-    isError || isPending ? [] : reportData.Details;
-
-  const excel_data = [
-    {
-      ySteps: 1,
-      xSteps: 1,
-      columns: [
-        { title: "Group Name" },
-        { title: " " },
-        { title: "Town" },
-        { title: " " },
-        { title: "County" },
-        { title: " " },
-        { title: "Constituency" },
-        { title: " " },
-        { title: "Ward" },
-      ],
-      data: [
-        [
-          reportData?.GroupName as string,
-          "" as string,
-          reportData?.Town as string,
-          "" as string,
-          reportData?.County as string,
-          "" as string,
-          reportData?.Ward as string,
-        ],
-      ],
-    },
-    {
-      ySteps: 5,
-      xSteps: 0,
-      columns: [
-        {
-          title: "Member Number",
-        },
-        {
-          title: "Member Name",
-        },
-        {
-          title: "ID Number",
-        },
-        {
-          title: "Phone Number",
-        },
-        {
-          title: "Date Joined",
-        },
-        {
-          title: "Total Savings",
-        },
-        {
-          title: "Total Interest Repayments",
-        },
-        {
-          title: "Semi-Loan Balance",
-        },
-        {
-          title: "Semi-Loan Interest Balance",
-        },
-        {
-          title: "Loan Interest Balance",
-        },
-        {
-          title: "Actual Payout",
-        },
-      ],
-      data: [
-        ...refinedData.map((report) => [
-          report.CustomerNo,
-          `${report.FirstName}  ${report.OtherNames}`,
-          report.IDNumber,
-          report.phone_number,
-          report.DateJoined,
-          Number(report.TotalSavings).toLocaleString(),
-          Number(report.TotalInterestRepayments).toLocaleString(),
-          Number(report.SemiLoanBalance).toLocaleString(),
-          Number(report.SemiLoanInterestBalance).toLocaleString(),
-          Number(report.LoanInterestBalance).toLocaleString(),
-          Number(report.ActualPayout).toLocaleString(),
-        ]),
-      ],
-    },
-  ];
+  const refinedData: EOYDetail[] = isSuccess ? reportData?.Details : [];
 
   const renderCell = React.useCallback(
     (report: EOYDetail, columnKey: React.Key) => {
@@ -205,6 +122,93 @@ const EOYGroupReport = () => {
     []
   );
 
+  if (isPending) {
+    return <PendingState />;
+  }
+
+  const excel_data = [
+    {
+      ySteps: 1,
+      xSteps: 1,
+      columns: [
+        { title: "Group Name" },
+        { title: " " },
+        { title: "Town" },
+        { title: " " },
+        { title: "County" },
+        { title: " " },
+        { title: "Constituency" },
+        { title: " " },
+        { title: "Ward" },
+      ],
+      data: [
+        [
+          reportData?.GroupName as string,
+          "" as string,
+          reportData?.Town as string,
+          "" as string,
+          reportData?.County as string,
+          "" as string,
+          reportData?.Ward as string,
+        ],
+      ],
+    },
+    {
+      ySteps: 5,
+      xSteps: 0,
+      columns: [
+        {
+          title: "Member Number",
+        },
+        {
+          title: "Member Name",
+        },
+        {
+          title: "ID Number",
+        },
+        {
+          title: "Phone Number",
+        },
+        {
+          title: "Date Joined",
+        },
+        {
+          title: "Total Savings",
+        },
+        {
+          title: "Total Interest Repayments",
+        },
+        {
+          title: "Short Term Loan Balance",
+        },
+        {
+          title: "Short Term Loan Interest Balance",
+        },
+        {
+          title: "Loan Interest Balance",
+        },
+        {
+          title: "Actual Payout",
+        },
+      ],
+      data: [
+        ...refinedData.map((report) => [
+          report.CustomerNo,
+          `${report.FirstName}  ${report.OtherNames}`,
+          report.IDNumber,
+          report.phone_number,
+          report.DateJoined,
+          Number(report.TotalSavings).toLocaleString(),
+          Number(report.TotalInterestRepayments).toLocaleString(),
+          Number(report.SemiLoanBalance).toLocaleString(),
+          Number(report.SemiLoanInterestBalance).toLocaleString(),
+          Number(report.LoanInterestBalance).toLocaleString(),
+          Number(report.ActualPayout).toLocaleString(),
+        ]),
+      ],
+    },
+  ];
+
   const group_name = reportData?.GroupName;
 
   const DownloadButton = () => {
@@ -242,7 +246,7 @@ const EOYGroupReport = () => {
         </TableHeader>
         <TableBody
           isLoading={isPending}
-          items={refinedData}
+          items={refinedData ? refinedData : []}
           emptyContent={error?.response?.data?.Message as string}
           loadingContent={<Spinner />}
         >
@@ -331,11 +335,11 @@ export const EOYGroup_columns = [
   },
   {
     key: "SemiLoanBalance",
-    label: "Semi-Loan Balance",
+    label: "STL Balance",
   },
   {
     key: "SemiLoanInterestBalance",
-    label: "Semi-Loan Interest Balance",
+    label: "STL Interest Balance",
   },
   {
     key: "LoanInterestBalance",

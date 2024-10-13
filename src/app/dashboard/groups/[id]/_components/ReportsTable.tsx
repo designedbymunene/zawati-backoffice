@@ -76,21 +76,21 @@ const ReportsTable = () => {
       ),
     }),
     columnHelper.accessor("LTLBalance", {
-      header: "Semi-Loan Balance",
+      header: "STL Balance",
       cell: (info) => Number(info.renderValue()).toLocaleString(),
       footer: () => (
         <p>{Number(reportData?.TotalLTLBalance).toLocaleString()}</p>
       ),
     }),
     columnHelper.accessor("LTLInterest", {
-      header: "Semi-Loan Interest",
+      header: "STL Interest",
       cell: (info) => Number(info.renderValue()).toLocaleString(),
       footer: () => (
         <p>{Number(reportData?.TotalLTLInterest).toLocaleString()}</p>
       ),
     }),
     columnHelper.accessor("LTLRepayment", {
-      header: "Total Semi-Loan Repayment",
+      header: "Total STL Repayment",
       cell: (info) => Number(info.renderValue()).toLocaleString(),
       footer: () => (
         <p>{Number(reportData?.TotalLTLRepayment).toLocaleString()}</p>
@@ -148,16 +148,16 @@ const ReportsTable = () => {
           title: "Savings CF",
         },
         {
-          title: "Semi-Loan BF",
+          title: "STL BF",
         },
         {
-          title: "Semi-Loan Paid",
+          title: "STL Paid",
         },
         {
-          title: "Semi-Loan Interest",
+          title: "STL Interest",
         },
         {
-          title: "Semi-Loan CF",
+          title: "STL CF",
         },
         {
           title: "Cover",
@@ -271,11 +271,7 @@ const ReportsTable = () => {
       data: [
         ["Banking", Number(reportData?.Banking).toLocaleString(), ""],
         ["Loan", Number(reportData?.TotalSTLRepayment).toLocaleString(), ""],
-        [
-          "Semi-Loan",
-          Number(reportData?.TotalLTLRepayment).toLocaleString(),
-          "",
-        ],
+        ["STL", Number(reportData?.TotalLTLRepayment).toLocaleString(), ""],
         ["Savings", Number(reportData?.TotalSavings).toLocaleString(), ""],
       ],
     },

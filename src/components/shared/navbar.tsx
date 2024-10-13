@@ -12,7 +12,7 @@ import {
 } from "@nextui-org/react";
 import ThemeSwitcher from "./themeSwitcher";
 import { handleSignOut } from "@/middleware";
-import useHydratedStore, { useUserStore } from "@/app/(auth)/_store";
+import { useUserStore } from "@/app/(auth)/_store";
 
 const Navbar = () => {
   const { user } = useUserStore();

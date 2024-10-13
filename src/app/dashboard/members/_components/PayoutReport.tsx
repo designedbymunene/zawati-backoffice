@@ -102,11 +102,10 @@ const PayoutReport = () => {
       <div className="mb-4">
         <h2 className="text-xl font-semibold">Customer Loans</h2>
         <p>
-          <strong>Semi Loan Balance:</strong>{" "}
-          {data?.CustomerLoans.SemiLoanBalance}
+          <strong>STL Balance:</strong> {data?.CustomerLoans.SemiLoanBalance}
         </p>
         <p>
-          <strong>Semi Loan Interest Balance:</strong>{" "}
+          <strong>STL Interest Balance:</strong>{" "}
           {data?.CustomerLoans.SemiLoanInterestBalance}
         </p>
         <p>

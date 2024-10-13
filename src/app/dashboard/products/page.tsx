@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -11,6 +11,7 @@ import {
   Tooltip,
   Input,
   Button,
+  Spinner,
 } from "@nextui-org/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +25,7 @@ export interface Products {
   ProductDescription: string;
   ProductCost: string;
   ContributionFrequency: string;
+  WaitingPeriod: string;
 }
 
 const columns = [
@@ -44,6 +46,10 @@ const columns = [
     label: "Contribution Frequency",
   },
   {
+    key: "WaitingPeriod",
+    label: "Waiting Period",
+  },
+  {
     key: "actions",
     label: "Actions",
   },
@@ -58,7 +64,9 @@ const frequencyTypeMap: Record<string, string> = {
 
 const ProductsPage = () => {
   const [isModalOpen, setModalOpen] = React.useState<boolean>(false);
-  const { isPending, isError, data, error } = useFetchProducts();
+  const [page, setPage] = useState(1);
+
+  const { isPending, isError, data, error, isSuccess } = useFetchProducts();
 
   const renderCell = React.useCallback(
     (products: Products, columnKey: React.Key) => {
@@ -100,6 +108,14 @@ const ProductsPage = () => {
               </p>
             </div>
           );
+        case "WaitingPeriod":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-sm capitalize text-default-400">
+                {products.WaitingPeriod}
+              </p>
+            </div>
+          );
         case "actions":
           return (
             <div className="relative flex gap-2">
@@ -121,14 +137,6 @@ const ProductsPage = () => {
     []
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
-  if (isError) {
-    return <>Error</>;
-  }
-
   return (
     <>
       <Table
@@ -148,13 +156,31 @@ const ProductsPage = () => {
         classNames={{
           wrapper: "min-h-[222px]",
         }}
+        // bottomContent={
+        //   <div className="flex w-full justify-center">
+        //     <Pagination
+        //       isCompact
+        //       showControls
+        //       showShadow
+        //       color="primary"
+        //       page={page}
+        //       total={10}
+        //       onChange={(page) => setPage(page)}
+        //     />
+        //   </div>
+        // }
       >
         <TableHeader columns={columns}>
           {(column) => (
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data as Products[]}>
+        <TableBody
+          items={isSuccess ? (data as Products[]) : isError ? [] : []}
+          isLoading={isPending}
+          emptyContent={isError ? error.message : "No Products found"}
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
             <TableRow key={item.ProductID}>
               {(columnKey) => (

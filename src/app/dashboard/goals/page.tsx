@@ -11,6 +11,8 @@ import {
   Tooltip,
   User,
   Button,
+  Spinner,
+  Pagination,
 } from "@nextui-org/react";
 import Link from "next/link";
 
@@ -47,8 +49,13 @@ const columns = [
 ];
 
 const GoalsPage = () => {
+  const [page, setPage] = useState(1);
 
-  const { isPending, isError, data, error } = useFetchGoalMembers();
+  const { isPending, isError, data, error, isSuccess } = useFetchGoalMembers({
+    Offset: String(page - 1),
+    Limit: "10",
+  });
+
   const renderCell = React.useCallback(
     (member: GoalMembers, columnKey: React.Key) => {
       const cellValue = member[columnKey as keyof GoalMembers];
@@ -106,32 +113,24 @@ const GoalsPage = () => {
     []
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
-  if (isError) {
-    return <>Error</>;
-  }
-
   return (
     <>
       <Table
         isHeaderSticky
         aria-label="Goal Member table"
-        // bottomContent={
-        //   <div className="flex w-full justify-center">
-        //     <Pagination
-        //       isCompact
-        //       showControls
-        //       showShadow
-        //       color="secondary"
-        //       page={page}
-        //       total={pages}
-        //       onChange={(page) => setPage(page)}
-        //     />
-        //   </div>
-        // }
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={10}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        }
         classNames={{
           wrapper: "min-h-[222px]",
         }}
@@ -141,7 +140,12 @@ const GoalsPage = () => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data as GoalMembers[]}>
+        <TableBody
+          items={isSuccess ? (data as GoalMembers[]) : isError ? [] : []}
+          isLoading={isPending}
+          emptyContent={isError ? error.message : "No members found"}
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
             <TableRow key={item.CustomerID}>
               {(columnKey) => (
@@ -151,8 +155,7 @@ const GoalsPage = () => {
           )}
         </TableBody>
       </Table>
-
     </>
   );
 };
-export default GoalsPage
+export default GoalsPage;

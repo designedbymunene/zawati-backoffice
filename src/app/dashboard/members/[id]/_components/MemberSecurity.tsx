@@ -71,7 +71,7 @@ const MemberSecurity = () => {
   const handleUnblockCustomer = () => {
     unblockCustomerMutation.mutate({
       CustomerID: params.id,
-      UserID: user.UserID as string,
+      UserID: user?.UserID as string,
     });
   };
 
@@ -80,7 +80,7 @@ const MemberSecurity = () => {
   const handleChangeDevice = () => {
     changeDeviceMutation.mutate({
       CustomerID: params.id,
-      UserID: user.UserID as string,
+      UserID: user?.UserID as string,
       DeviceID: deviceID,
       DeviceMake: deviceMake,
       Platform: "0",

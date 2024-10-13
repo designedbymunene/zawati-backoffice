@@ -17,7 +17,11 @@ const FormMemberSelect = ({
   label,
   errors,
 }: FormMemberSelectProps) => {
-  const { isPending, error, isError, data } = useFetchAllMembers();
+  const { isPending, error, isError, data } = useFetchAllMembers({
+    AnyName: "",
+    Offset: "",
+    Limit: "",
+  });
 
   return (
     <Controller

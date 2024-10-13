@@ -31,8 +31,8 @@ const StatisticsCard = ({
             {stats === undefined || String(stats).length === 0
               ? "0"
               : type === "date"
-              ? Number(stats).toLocaleString()
-              : stats}
+              ? stats
+              : Number(stats).toLocaleString()}
           </p>
         </div>
       </div>

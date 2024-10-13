@@ -61,7 +61,7 @@ const PerformanceReport = () => {
         { title: "Total Cover" },
         { title: "Total Interest Paid" },
         { title: "Total Register Fee Paid" },
-        { title: "Total Semi-Loan Balance" },
+        { title: "Total STL Balance" },
         { title: "Thirty Days NPA" },
         { title: "Thirty Days NPA Balance" },
         { title: "Sixty Days NPA" },
@@ -155,7 +155,7 @@ const PerformanceReport = () => {
           stats={data?.SavingsLoans?.TotalRegFeePaid}
         />
         <StatisticsCard
-          title={"Total Semi-Loan Balance"}
+          title={"Total STL Balance"}
           stats={data?.SavingsLoans?.TotalSemiLoanBalance}
         />
         <StatisticsCard

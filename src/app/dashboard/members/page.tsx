@@ -100,7 +100,9 @@ const MembersPage = () => {
           className="w-80"
           placeholder="Search Member"
           startContent={<SearchIcon />}
-          onChange={(event) => setSearchTerm(event.target.value)}
+          onChange={(event) => {
+            setSearchTerm(event.target.value), setPage(1);
+          }}
         />
         <div />
         <Button onClick={() => setModalOpen(true)}>Create Member</Button>

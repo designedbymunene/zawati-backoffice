@@ -130,11 +130,13 @@ const useCreateFixedInterestLoan = () => {
 export function useGetLoanInstallments(id: string) {
   return useQuery({
     queryKey: ["ward"],
-    queryFn: async () =>
-      await axiosService.post("", {
+    queryFn: async () => {
+      const response = await axiosService.post("", {
         RequestID: "GetLoanInstallments",
         LoanID: id,
-      }),
+      });
+      return response.data;
+    },
   });
 }
 

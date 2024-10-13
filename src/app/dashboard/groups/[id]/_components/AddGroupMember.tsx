@@ -17,7 +17,11 @@ import { useAddGroupMember } from "@/hooks/api/groups-api";
 const AddGroupMember: React.FC<Props> = ({ isOpen, onOpenChange }) => {
   const params = useParams<{ id: string }>();
 
-  const { isPending, error, isError, data } = useFetchAllMembers();
+  const { isPending, error, isError, data } = useFetchAllMembers({
+    AnyName: "",
+    Offset: "",
+    Limit: "",
+  });
   const { mutate, isPending: isSavePending } = useAddGroupMember();
 
   const [member, setMember] = React.useState<React.Key | null>("");

@@ -47,7 +47,7 @@ export default function DashboardHome() {
       <div className="flex flex-row justify-between items-center mb-5">
         <div>
           <p className="text-3xl font-serif font-bold">
-            {wish} {user.UserName} 👋
+            {wish} {user?.UserName} 👋
           </p>
           <p className="text-xl font-sans">{date}</p>
         </div>
@@ -113,7 +113,7 @@ export default function DashboardHome() {
                     dashboardStatistics?.data?.SavingsLoans
                       ?.TotalSemiLoanBalance
                   }
-                  title="Total Semi Loan Balance"
+                  title="Total STL Loan Balance"
                 />
               </>
             )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs, Tab } from "@nextui-org/react";
 import {
   AppWindowIcon,
@@ -38,31 +38,16 @@ export interface GroupMeetingType {
   OfficialComments: string;
 }
 
-// function getClosestMeeting(meetings: GroupMeetingType[]) {
-//   const today = new Date();
-
-//   return (
-//     meetings &&
-//     meetings.reduce((closest: GroupMeetingType, current: GroupMeetingType) => {
-//       const currentDate = parseISO(current.ScheduledDate);
-//       const closestDate = parseISO(closest.ScheduledDate);
-
-//       const diffCurrent = Math.abs(differenceInDays(currentDate, today));
-//       const diffClosest = Math.abs(differenceInDays(closestDate, today));
-
-//       return diffCurrent < diffClosest ? current : closest;
-//     })
-//   );
-// }
-
 function getClosestMeeting(meetings: GroupMeetingType[]) {
   const today = new Date();
 
   // Filter out meetings that are scheduled before today
-  const upcomingMeetings = meetings.filter((meeting) => {
-    const scheduledDate = parseISO(meeting.ScheduledDate);
-    return !isBefore(scheduledDate, today); // Only include meetings that are today or in the future
-  });
+  const upcomingMeetings = meetings
+    ? meetings.filter((meeting) => {
+        const scheduledDate = parseISO(meeting.ScheduledDate);
+        return !isBefore(scheduledDate, today); // Only include meetings that are today or in the future
+      })
+    : [];
 
   if (upcomingMeetings.length === 0) {
     return {
@@ -94,14 +79,25 @@ function getClosestMeeting(meetings: GroupMeetingType[]) {
 
 const ViewGroup = () => {
   const params = useParams();
-  const { user } = useUserStore();
   const { data, isPending, isSuccess } = useGetGroupMembers(
     params.id as string
   );
 
+  const user = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    if (!user) {
+      null;
+    }
+  }, [user]);
+
+  if (!user) {
+    <div>Validating user credentials...</div>;
+  }
+
   const nextMeeting = useGetGroupMeetings({
     GroupID: params.id as string,
-    UserID: user.UserID as string,
+    UserID: user?.UserID as string,
   });
 
   const initialMeeting = {
@@ -127,6 +123,10 @@ const ViewGroup = () => {
     nextMeeting.isSuccess && closestMeeting.ScheduledDate.length > 1
       ? format(new Date(closestMeeting.ScheduledDate), "d MMM yyyy")
       : " - - ";
+
+  const allowedRolesForAdminTabs = ["Admin", "Loan Schedular"];
+
+  const role = user ? user?.Role : "";
   // TODO: Shouldn't show previous date if it is in the future
   // TODO: Latitude and Longitude should be added - GPS coordinates
   return (
@@ -210,59 +210,58 @@ const ViewGroup = () => {
             <GroupMembersPage />
           </Tab>
 
-          {user?.Role?.includes("Admin") ||
-            (user?.Role?.includes("Loan Scheduler") && (
-              <>
-                <Tab
-                  key="4"
-                  title={
-                    <div className="flex items-center space-x-2">
-                      <CalendarIcon />
-                      <span>Group Meetings</span>
-                    </div>
-                  }
-                >
-                  <GroupMeetings />
-                </Tab>
-                <Tab
-                  key="5"
-                  title={
-                    <div className="flex items-center space-x-2">
-                      <Table2Icon />
-                      <span>Schedule Loan</span>
-                    </div>
-                  }
-                >
-                  <ScheduleLoanTable />
-                </Tab>
-              </>
-            ))}
+          {allowedRolesForAdminTabs.includes(role) && (
+            <Tab
+              key="4"
+              title={
+                <div className="flex items-center space-x-2">
+                  <CalendarIcon />
+                  <span>Group Meetings</span>
+                </div>
+              }
+            >
+              <GroupMeetings />
+            </Tab>
+          )}
+          {allowedRolesForAdminTabs.includes(role) && (
+            <Tab
+              key="5"
+              title={
+                <div className="flex items-center space-x-2">
+                  <Table2Icon />
+                  <span>Schedule Loan</span>
+                </div>
+              }
+            >
+              <ScheduleLoanTable />
+            </Tab>
+          )}
 
           {user?.Role === "Admin" && (
-            <>
-              <Tab
-                key="6"
-                title={
-                  <div className="flex items-center space-x-2">
-                    <FileStack />
-                    <span>Group Reports</span>
-                  </div>
-                }
-              >
-                <ReportsTable />
-              </Tab>
-              <Tab
-                key="7"
-                title={
-                  <div className="flex items-center space-x-2">
-                    <FileSpreadsheet />
-                    <span>EOY Group Reports</span>
-                  </div>
-                }
-              >
-                <EOYGroupReport />
-              </Tab>
-            </>
+            <Tab
+              key="6"
+              title={
+                <div className="flex items-center space-x-2">
+                  <FileStack />
+                  <span>Group Reports</span>
+                </div>
+              }
+            >
+              <ReportsTable />
+            </Tab>
+          )}
+          {user?.Role === "Admin" && (
+            <Tab
+              key="7"
+              title={
+                <div className="flex items-center space-x-2">
+                  <FileSpreadsheet />
+                  <span>EOY Group Reports</span>
+                </div>
+              }
+            >
+              <EOYGroupReport />
+            </Tab>
           )}
         </Tabs>
       </div>

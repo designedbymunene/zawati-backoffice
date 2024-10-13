@@ -88,7 +88,7 @@ const GroupMeetings = () => {
 
   const { isPending, data, isError, isSuccess } = useGetGroupMeetings({
     GroupID: params.id as string,
-    UserID: user.UserID as string,
+    UserID: user?.UserID as string,
   });
   const { mutate, isPending: isCreatePending } = useCreateGroupMeeting();
   const startMeeting = useStartGroupMeeting();
@@ -105,7 +105,7 @@ const GroupMeetings = () => {
       ScheduledDate: format(startDate as Date, "yyyy-MM-dd"),
       Start: format(startTime as Date, "hh:mm:ss"),
       End: format(endTime as Date, "hh:mm:ss"),
-      UserID: user.UserID as string,
+      UserID: user?.UserID as string,
     };
 
     mutate(data);

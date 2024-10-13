@@ -2,10 +2,10 @@
 import ErrorPage from "@/components/shared/ErrorPage";
 import PendingState from "@/components/shared/PendingState";
 import { axiosInstance } from "@/services/api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { FC, useState } from "react";
-import { RegisterUserRequest, useRegisterUser, UserRoles } from "../page";
+import { UserRoles } from "../page";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axiosService from "@/services/axios-service";
@@ -61,7 +61,7 @@ const UserProfile: FC = () => {
     },
   });
 
-  const mutation = useRegisterUser();
+  const mutation = useUpdateUser();
 
   // status 2 - deactivated; 1 - active
 
@@ -116,7 +116,7 @@ const UserProfile: FC = () => {
           <Select
             variant="bordered"
             isLoading={userRoles.isPending}
-            items={userRoles.data}
+            items={userRoles.data || []}
             label="User Role"
             placeholder={data.UserRole}
             selectedKeys={updateData?.UserRole}
@@ -128,16 +128,12 @@ const UserProfile: FC = () => {
               <SelectItem key={role.RoleID}>{role.RoleName}</SelectItem>
             )}
           </Select>
-          {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            UserRole
-          </label>
-          <p className="text-lg">{data.UserRole}</p> */}
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Date Created
           </label>
-          <p className="text-lg">{data.DateCreated}</p>
+          <p className="text-lg">{data?.DateCreated}</p>
         </div>
         <div className="mb-4">
           <Select
@@ -148,7 +144,7 @@ const UserProfile: FC = () => {
             ]}
             label="User Status"
             placeholder={statusLabel}
-            selectedKeys={updateData?.Role}
+            selectedKeys={updateData?.Status}
             onSelectionChange={(item) =>
               setUpdateData({ Status: item.currentKey })
             }
@@ -157,33 +153,13 @@ const UserProfile: FC = () => {
               <SelectItem key={status.id}>{status.label}</SelectItem>
             )}
           </Select>
-          {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Status
-          </label>
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${
-              data.Status === "1"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {statusLabel}
-          </span> */}
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             No. of Login Attempts
           </label>
-          <p className="text-lg">{data.NoOfAttempts}</p>
+          <p className="text-lg">{data?.NoOfAttempts}</p>
         </div>
-        {/* <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Change Password Required
-          </label>
-          <p className="text-lg">
-            {data.ChangePassword === "1" ? "Yes" : "No"}
-          </p>
-        </div> */}
         <Button
           isLoading={mutation.isPending}
           isDisabled={mutation.isPending}
@@ -198,3 +174,23 @@ const UserProfile: FC = () => {
 };
 
 export default UserProfile;
+
+interface UpdateUser {
+  UserID: string;
+  UserRole: string;
+  Status: string;
+}
+
+const updateUser = async (request: Partial<UpdateUser>) => {
+  const response = await axiosService.post("", {
+    RequestID: "CreateSystemUser",
+    ...request,
+  });
+  return response.data;
+};
+
+const useUpdateUser = () => {
+  return useMutation({
+    mutationFn: updateUser,
+  });
+};

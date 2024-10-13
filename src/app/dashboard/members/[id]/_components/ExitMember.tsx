@@ -110,10 +110,10 @@ const ExitMember = () => {
       xSteps: 1,
       columns: [
         {
-          title: "Semi-Loan Balance",
+          title: "STL Balance",
         },
         {
-          title: "Semi-Loan Interest Balance",
+          title: "STL Interest Balance",
         },
         {
           title: "Loan Balance",

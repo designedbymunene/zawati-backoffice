@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -11,10 +11,13 @@ import {
   Chip,
   ChipProps,
   Button,
+  Pagination,
+  Spinner,
 } from "@nextui-org/react";
 
 import { GetSavingsType, useGetSavings } from "@/hooks/api/savings-api";
 import AddSavingsDrawer from "./[id]/AddSavingsDrawer";
+import { useDebounce } from "@uidotdev/usehooks";
 
 const columns = [
   {
@@ -86,17 +89,22 @@ const savingTypeMap: Record<string, string> = {
 
 const SavingsPage = () => {
   const hasValues = false;
+  const [page, setPage] = useState(1);
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const body = {
     RequestID: "GetSavings",
     // CustomerID: CustomerID,
     // GroupID: GroupID,
     // ProductID: ProductID,
+    Offset: String(page - 1),
+    Limit: "10",
   };
 
-  console.log("BODY", body);
   const [isModalOpen, setModalOpen] = React.useState<boolean>(false);
 
-  const { isPending, isError, data, error } = useGetSavings(body);
+  const { isPending, isError, data, error, isSuccess } = useGetSavings(body);
 
   const renderCell = React.useCallback(
     (savings: GetSavingsType, columnKey: React.Key) => {
@@ -186,14 +194,6 @@ const SavingsPage = () => {
     []
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
-  if (isError) {
-    return <>Error</>;
-  }
-
   return (
     <>
       <Table
@@ -212,6 +212,19 @@ const SavingsPage = () => {
             </div>
           )
         }
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={10}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        }
         classNames={{
           wrapper: "min-h-[222px]",
         }}
@@ -221,7 +234,12 @@ const SavingsPage = () => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data as GetSavingsType[]}>
+        <TableBody
+          items={isSuccess ? (data as GetSavingsType[]) : isError ? [] : []}
+          isLoading={isPending}
+          emptyContent={isError ? error.message : "No members found"}
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
             <TableRow key={item.SavingID}>
               {(columnKey) => (

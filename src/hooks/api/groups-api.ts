@@ -1,6 +1,11 @@
 import { GroupType } from "@/lib/types/group_type";
 import axiosService from "@/services/axios-service";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 interface AllGroupsRequest {
@@ -21,6 +26,7 @@ const useFetchAllGroups = (payload: AllGroupsRequest) => {
   return useQuery({
     queryKey: ["groups", payload],
     queryFn: () => fetchAllGroups(payload),
+    placeholderData: keepPreviousData,
   });
 };
 
