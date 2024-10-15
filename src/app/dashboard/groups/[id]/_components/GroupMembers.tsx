@@ -108,7 +108,7 @@ const GroupMembersPage = () => {
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {member.YearOfBirth}
+                {member.YearOfBirth?.split("-")[0]}
               </p>
             </div>
           );

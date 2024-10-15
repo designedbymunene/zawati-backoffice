@@ -152,6 +152,7 @@ export interface ChangeCustomerDeviceRequest {
   DeviceID: string;
   DeviceMake: string;
   Platform: string;
+  PhoneNo: string;
 }
 
 const useChangeCustomerDevice = () => {
