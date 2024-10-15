@@ -12,6 +12,7 @@ import {
   Tooltip,
   ChipProps,
   Input,
+  Spinner,
 } from "@nextui-org/react";
 import { SaveIcon, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,10 @@ const columns = [
   {
     key: "FeesName",
     label: "Name",
+  },
+  {
+    key: "Slug",
+    label: "Slug",
   },
   {
     key: "FeeType",
@@ -57,9 +62,18 @@ const modeDescriptionMap: Record<string, string> = {
   O: "Once",
 };
 
+const savingTypeMap: Record<string, string> = {
+  P: "Penalty",
+  MF: "Membership fee",
+  I: "Interest",
+  C: "Contribution",
+};
+
 const ProductPage = () => {
   const params = useParams<{ id: string }>();
-  const { isPending, data, isError } = useGetProductFees(params.id);
+  const { isPending, data, isError, isSuccess, error } = useGetProductFees(
+    params.id
+  );
 
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -77,7 +91,14 @@ const ProductPage = () => {
               </p>
             </div>
           );
-
+        case "Slug":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-sm capitalize">
+                {savingTypeMap[fees.Slug]}
+              </p>
+            </div>
+          );
         case "FeeType":
           return (
             <div className="flex flex-col">
@@ -118,10 +139,6 @@ const ProductPage = () => {
     []
   );
 
-  if (isPending) {
-    return <>Pending</>;
-  }
-
   if (isError) {
     return (
       <div>
@@ -160,7 +177,12 @@ const ProductPage = () => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={data}>
+        <TableBody
+          items={isSuccess ? data : isError ? [] : []}
+          isLoading={isPending}
+          emptyContent={isError ? error?.message : "No Products found"}
+          loadingContent={<Spinner label="Loading ..." />}
+        >
           {(item) => (
             <TableRow key={item.FeeID}>
               {(columnKey) => (

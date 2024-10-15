@@ -33,7 +33,6 @@ const CreateProductFee: React.FC<Props> = ({ isOpen, onOpenChange }) => {
   const onSubmit = (data: any) => {
     const submitData = {
       RequestID: "CreateProductFees",
-      FeeSlug: textToSlug(data.FeeName),
       ProductID: params.id,
       ...data,
     };
@@ -65,6 +64,18 @@ const CreateProductFee: React.FC<Props> = ({ isOpen, onOpenChange }) => {
             name="FeeValue"
             control={control}
             errors={errors}
+          />
+          <FormSelect
+            label="Fee Slug"
+            name="FeeSlug"
+            control={control}
+            errors={errors}
+            options={[
+              { label: "Penalty", value: "P" },
+              { label: "Membership fee", value: "MF" },
+              { label: "Interest", value: "I" },
+              { label: "Contribution", value: "C" },
+            ]}
           />
           <FormSelect
             label="Fee Type"

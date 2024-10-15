@@ -21,6 +21,7 @@ const MemberSecurity = () => {
   const [confirmPIN, setConfirmPIN] = useState("");
   const [deviceID, setDeviceID] = useState("");
   const [deviceMake, setDeviceMake] = useState("");
+  const [PhoneNo, setPhoneNo] = useState("");
 
   const resetPINMutation = useMutation({
     mutationFn: resetPIN,
@@ -83,6 +84,7 @@ const MemberSecurity = () => {
       UserID: user?.UserID as string,
       DeviceID: deviceID,
       DeviceMake: deviceMake,
+      PhoneNo: PhoneNo,
       Platform: "0",
     });
   };
@@ -133,6 +135,13 @@ const MemberSecurity = () => {
 
       <div className="grid w-auto gap-4 justify-items-center align-items-center">
         <p className="text-lg font-bold">Change Device</p>
+        <Input
+          label="Phone Number"
+          type="text"
+          placeholder="Enter the Phone Number"
+          onChange={(e) => setPhoneNo(e.target.value)}
+          value={PhoneNo}
+        />
         <Input
           label="Device ID"
           type="text"
